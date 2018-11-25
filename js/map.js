@@ -2,11 +2,13 @@
 
 var MAP_Y_MIN = 130;
 var MAP_Y_MAX = 630;
+var MIN_AUTHOR_AVATAR_START_NUMBER = 1;
 var MIN_PRICE = 1000;
 var MAX_PRICE = 1000000;
 var MIN_ROOMS = 1;
 var MAX_ROOMS = 5;
 var MAX_GUESTS = 10;
+var MIN_FEATURES_QUANTITY = 1;
 
 var mapBlock = document.querySelector('.map');
 var map = document.querySelector('.map__pins');
@@ -30,32 +32,15 @@ function getRandomNumber(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function getRandomSort() {
-  return Math.random() - 0.5;
-}
-
-function getRandomNumbersArr(n) {
-  var numbersArr = [];
-
-  for (var i = 0; i < n; i++) {
-    numbersArr.push(i);
-  }
-
-  numbersArr.sort(getRandomSort);
-
-  return numbersArr;
-}
-
 function generateAuthor(authorNumber) {
   var author = {};
-  author.avatar = 'img/avatars/user0' + authorNumber + '.png';
+  author.avatar = 'img/avatars/user0' + (MIN_AUTHOR_AVATAR_START_NUMBER + authorNumber) + '.png';
 
   return author;
 }
 
 function generateOffer(cardNumber, coordsX, coordsY) {
   var offer = {};
-  var randomPhotosArr = getRandomNumbersArr(apartmentPhotos.length);
 
   offer.title = apartmentType[cardNumber];
   offer.adress = coordsX + ', ' + coordsY;
@@ -67,7 +52,7 @@ function generateOffer(cardNumber, coordsX, coordsY) {
   offer.checkout = checkouts[getRandomNumber(0, checkouts.length - 1)];
 
   offer.features = [];
-  for (var i = 0; i < getRandomNumber(1, apartmentFeatures.length); i++) {
+  for (var i = 0; i < getRandomNumber(MIN_FEATURES_QUANTITY, apartmentFeatures.length); i++) {
     offer.features.push(apartmentFeatures[i]);
   }
 
@@ -75,7 +60,7 @@ function generateOffer(cardNumber, coordsX, coordsY) {
 
   offer.photos = [];
   for (var j = 0; j < apartmentPhotos.length; j++) {
-    offer.photos.push(apartmentPhotos[randomPhotosArr[j]]);
+    offer.photos.push(apartmentPhotos[j]);
   }
 
   return offer;
@@ -89,12 +74,12 @@ function generateLocationCoords() {
   return coords;
 }
 
-function generateCardData(cardNumber, authorNumber) {
+function generateCardData(cardNumber) {
   var objElement = {};
   var apartnentCoords = generateLocationCoords();
   var coordsX = apartnentCoords.x;
   var coordsY = apartnentCoords.y;
-  objElement.author = generateAuthor(authorNumber + 1);
+  objElement.author = generateAuthor(cardNumber);
   objElement.offer = generateOffer(cardNumber, coordsX, coordsY);
   objElement.location = apartnentCoords;
 
@@ -103,10 +88,9 @@ function generateCardData(cardNumber, authorNumber) {
 
 function generateCards(numberOfCards) {
   var cardsArr = [];
-  var authorNumbers = getRandomNumbersArr(numberOfCards);
 
   for (var i = 0; i < numberOfCards; i++) {
-    cardsArr.push(generateCardData(i, authorNumbers[i]));
+    cardsArr.push(generateCardData(i));
   }
 
   return cardsArr;
@@ -132,37 +116,39 @@ function renderMapPins(cards) {
   map.appendChild(fragment);
 }
 
-function refillList(list, element, quantity) {
+function removeListElements(list) {
   list.innerHTML = '';
-  for (var i = 0; i < quantity; i++) {
-    list.appendChild(element.cloneNode(true));
+}
+
+function generateClassModificator(className, modificator, n) {
+  if (Array.isArray(modificator)) {
+    return className + '--' + modificator[n];
+  } else {
+    return className + '--' + modificator;
   }
 }
 
-function changeelEmentsAttribute(arr, attribute, value) {
-  for (var i = 0; i < arr.length; i++) {
-    if (Array.isArray(value)) {
-      arr[i].setAttribute(attribute, value[i]);
-    } else {
-      arr[i].setAttribute(attribute, value);
-    }
+function changeElementAttribute(element, attribute, value, n) {
+  if (Array.isArray(value)) {
+    element.setAttribute(attribute, value[n]);
+  } else {
+    element.setAttribute(attribute, value);
   }
 }
 
-function generateClassModificator(element, modificator) {
-  return element + '--' + modificator;
+function generateFeaturesElements(featuresList, quontityOfElements, element, className, modificator) {
+  for (var i = 0; i < quontityOfElements; i++) {
+    var newElement = element.cloneNode(true);
+    newElement.className = className + ' ' + generateClassModificator(className, modificator, i);
+    featuresList.appendChild(newElement);
+  }
 }
 
-function changeElementsClassModificator(arr, modidficator) {
-  var newModificator;
-  for (var i = 0; i < arr.length; i++) {
-    arr[i].classList.remove(arr[i].classList[1]);
-    if (Array.isArray(modidficator)) {
-      newModificator = generateClassModificator(arr[i].classList[0], modidficator[i]);
-    } else {
-      newModificator = generateClassModificator(arr[i].classList[0], modidficator);
-    }
-    arr[i].classList.add(newModificator);
+function generateOfferPhotosElements(photosList, quontityOfElements, element, attribute, value) {
+  for (var i = 0; i < quontityOfElements; i++) {
+    var newElement = element.cloneNode(true);
+    changeElementAttribute(newElement, attribute, value, i);
+    photosList.appendChild(newElement);
   }
 }
 
@@ -190,15 +176,13 @@ function renderAnnouncement(card) {
   announcementCapacity.textContent = card.offer.rooms + ' комнаты для ' + card.offer.guests + ' гостей.';
   announcementTime.textContent = 'Заезд после ' + card.offer.checkin + ', выезд до ' + card.offer.checkout;
 
-  refillList(announcementFeaturesList, announcementFeature, card.offer.features.length);
-  var announcementFeatures = announcementFeaturesList.querySelectorAll('.popup__feature');
-  changeElementsClassModificator(announcementFeatures, card.offer.features);
+  removeListElements(announcementFeaturesList);
+  generateFeaturesElements(announcementFeaturesList, card.offer.features.length, announcementFeature, 'popup__feature', card.offer.features);
 
   announcementDescription.textContent = card.offer.description;
 
-  refillList(announcementPhotosList, announcementPhoto, card.offer.photos.length);
-  var announcementPhotos = announcementPhotosList.querySelectorAll('.popup__photo');
-  changeelEmentsAttribute(announcementPhotos, 'src', card.offer.photos);
+  removeListElements(announcementPhotosList);
+  generateOfferPhotosElements(announcementPhotosList, card.offer.photos.length, announcementPhoto, 'src', card.offer.photos);
 
   announcementAvatar.src = card.author.avatar;
 
