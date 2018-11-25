@@ -120,17 +120,17 @@ function removeListElements(list) {
   list.innerHTML = '';
 }
 
-function generateClassModificator(className, modificator, n) {
+function generateClassModificator(className, modificator, index) {
   if (Array.isArray(modificator)) {
-    return className + '--' + modificator[n];
+    return className + '--' + modificator[index];
   } else {
     return className + '--' + modificator;
   }
 }
 
-function changeElementAttribute(element, attribute, value, n) {
+function changeElementAttribute(element, attribute, value, index) {
   if (Array.isArray(value)) {
-    element.setAttribute(attribute, value[n]);
+    element.setAttribute(attribute, value[index]);
   } else {
     element.setAttribute(attribute, value);
   }
