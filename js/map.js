@@ -137,6 +137,7 @@ function changeElementAttribute(element, attribute, value, n) {
 }
 
 function generateFeaturesElements(featuresList, quontityOfElements, element, className, modificator) {
+  removeListElements(featuresList);
   for (var i = 0; i < quontityOfElements; i++) {
     var newElement = element.cloneNode(true);
     newElement.className = className + ' ' + generateClassModificator(className, modificator, i);
@@ -145,6 +146,7 @@ function generateFeaturesElements(featuresList, quontityOfElements, element, cla
 }
 
 function generateOfferPhotosElements(photosList, quontityOfElements, element, attribute, value) {
+  removeListElements(photosList);
   for (var i = 0; i < quontityOfElements; i++) {
     var newElement = element.cloneNode(true);
     changeElementAttribute(newElement, attribute, value, i);
@@ -176,12 +178,10 @@ function renderAnnouncement(card) {
   announcementCapacity.textContent = card.offer.rooms + ' комнаты для ' + card.offer.guests + ' гостей.';
   announcementTime.textContent = 'Заезд после ' + card.offer.checkin + ', выезд до ' + card.offer.checkout;
 
-  removeListElements(announcementFeaturesList);
   generateFeaturesElements(announcementFeaturesList, card.offer.features.length, announcementFeature, 'popup__feature', card.offer.features);
 
   announcementDescription.textContent = card.offer.description;
 
-  removeListElements(announcementPhotosList);
   generateOfferPhotosElements(announcementPhotosList, card.offer.photos.length, announcementPhoto, 'src', card.offer.photos);
 
   announcementAvatar.src = card.author.avatar;
