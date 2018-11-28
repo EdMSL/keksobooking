@@ -202,16 +202,30 @@ function renderAnnouncement(card) {
   mapBlock.insertBefore(fragment, filtersContainer);
 }
 
-var announcementCards = generateCards(totalCards);
+// var announcementCards = generateCards(totalCards);
 // renderMapPins(announcementCards);
 // renderAnnouncement(announcementCards[0]);
 
 
+var announcementCards = generateCards(totalCards);
 
-function activateMap() {
+function activateMapAndForm() {
+
   mapBlock.classList.remove('map--faded');
   noticeForm.classList.remove('ad-form--disabled');
+
   enableFormInputs();
+  renderMapPins(announcementCards);
+
+  for (var i = 0; i < announcementCards.length; i++) {
+    renderAnnouncement(announcementCards[i]);
+  }
+
+  for (var j = 0; j < announcementCards.length; j++) {
+    var mapPin = mapBlock.querySelectorAll('.map__pin:not(.map__pin--main)');
+
+    // onMapPinClick(mapPin[j], announcementCards[j]);
+  }
 }
 
 function disableFormInputs() {
@@ -240,10 +254,21 @@ function setAdress() {
   addressInput.value = (adresInputCoords.top - MAP_PIN_MAIN_HEIGHT) + ',' + (adresInputCoords.left - Math.round(MAP_PIN_MAIN_WIDTH / 2));
 }
 
-mapPinMain.addEventListener('mouseup', function () {
-  activateMap();
-});
+function onMapPinMainMouseup() {
+  activateMapAndForm();
+}
+
+function onMapPinClick(currentPin, currentAnnouncement) {
+  currentPin.addEventListener('click', function () {
+    renderAnnouncement(currentAnnouncement);
+  });
+}
+
+mapPinMain.addEventListener('mouseup', onMapPinMainMouseup);
+
+
 
 disableFormInputs();
 
 setAdress();
+
