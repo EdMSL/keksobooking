@@ -28,6 +28,18 @@ var checkouts = ['12:00', '13:00', '14:00'];
 var apartmentFeatures = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 var apartmentPhotos = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
 
+
+
+var mapPinMain = mapBlock.querySelector('.map__pin--main');
+
+var MAP_PIN_MAIN_WIDTH = mapPinMain.clientWidth;
+var MAP_PIN_MAIN_HEIGHT = mapPinMain.clientHeight;
+
+var notice = document.querySelector('.notice');
+var noticeForm = notice.querySelector('.ad-form');
+var noticeFieldsets = notice.querySelectorAll('.ad-form__element');
+var addressInput = notice.querySelector('#address');
+
 function getRandomNumber(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -191,5 +203,47 @@ function renderAnnouncement(card) {
 }
 
 var announcementCards = generateCards(totalCards);
-renderMapPins(announcementCards);
-renderAnnouncement(announcementCards[0]);
+// renderMapPins(announcementCards);
+// renderAnnouncement(announcementCards[0]);
+
+
+
+function activateMap() {
+  mapBlock.classList.remove('map--faded');
+  noticeForm.classList.remove('ad-form--disabled');
+  enableFormInputs();
+}
+
+function disableFormInputs() {
+  for (var i = 0; i < noticeFieldsets.length; i++) {
+    noticeFieldsets[i].setAttribute('disabled', true);
+  }
+}
+
+function enableFormInputs() {
+  for (var i = 0; i < noticeFieldsets.length; i++) {
+    noticeFieldsets[i].removeAttribute('disabled');
+  }
+}
+
+function getCoords(element) {
+  var box = element.getBoundingClientRect();
+
+  return {
+    top: Math.round(box.top + pageYOffset),
+    left: Math.round(box.left + pageXOffset)
+  };
+}
+
+function setAdress() {
+  var adresInputCoords = getCoords(mapPinMain);
+  addressInput.value = (adresInputCoords.top - MAP_PIN_MAIN_HEIGHT) + ',' + (adresInputCoords.left - Math.round(MAP_PIN_MAIN_WIDTH / 2));
+}
+
+mapPinMain.addEventListener('mouseup', function () {
+  activateMap();
+});
+
+disableFormInputs();
+
+setAdress();
