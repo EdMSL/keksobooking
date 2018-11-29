@@ -113,22 +113,29 @@ function generateCards(numberOfCards) {
 
 function renderMapPins(cards) {
   var pinTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
-  var pinWidth = getComputedStyle(pinTemplate, '::after').getPropertyValue('width');
-  var pinHeight = getComputedStyle(pinTemplate, '::after').getPropertyValue('height');
   var fragment = document.createDocumentFragment();
 
   for (var i = 0; i < cards.length; i++) {
     var pinElement = pinTemplate.cloneNode(true);
     var pinImg = pinElement.querySelector('img');
 
-    pinElement.style.left = cards[i].location.x - (parseInt(pinWidth, 10) / 2) + 'px';
-    pinElement.style.top = cards[i].location.y - parseInt(pinHeight, 10) + 'px';
+    pinElement.style.left = cards[i].location.x - pinElement.offsetWidth / 2 + 'px';
+    pinElement.style.top = cards[i].location.y - pinElement.offsetHeight + 'px';
     pinImg.alt = cards[i].offer.title;
     pinImg.src = cards[i].author.avatar;
 
     fragment.appendChild(pinElement);
   }
   map.appendChild(fragment);
+}
+
+function relocatePins() {
+  var pins = mapBlock.querySelectorAll('.map__pin:not(.map__pin--main)');
+
+  for (var i = 0; i < pins.length; i++) {
+    pins[i].style.left = parseInt(pins[i].style.left, 10) - pins[i].offsetWidth / 2 + 'px';
+    pins[i].style.top = parseInt(pins[i].style.top, 10) - pins[i].offsetHeight + 'px';
+  }
 }
 
 function removeListElements(list) {
@@ -290,6 +297,7 @@ function activateMapAndForm() {
 
   enableFormInputs();
   renderMapPins(announcementCards);
+  relocatePins();
   setMapPinsActionOnClick(announcementCards);
 }
 
