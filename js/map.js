@@ -1,5 +1,7 @@
 'use strict';
 
+var mapBlock = document.querySelector('.map');
+
 var MAP_Y_MIN = 130;
 var MAP_Y_MAX = 630;
 var MIN_AUTHOR_AVATAR_START_NUMBER = 1;
@@ -11,9 +13,9 @@ var MAX_GUESTS = 10;
 var MIN_FEATURES_QUANTITY = 1;
 var ESC_KEYCODE = 27;
 
-var mapBlock = document.querySelector('.map');
 var map = document.querySelector('.map__pins');
 var mapXmax = map.clientWidth;
+var mapPinMain = mapBlock.querySelector('.map__pin--main');
 var filtersContainer = document.querySelector('.map__filters-container');
 var totalCards = 8;
 var apartmentType = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
@@ -28,20 +30,25 @@ var checkins = ['12:00', '13:00', '14:00'];
 var checkouts = ['12:00', '13:00', '14:00'];
 var apartmentFeatures = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 var apartmentPhotos = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
-
-// ////////////////
-
-var mapPinMain = mapBlock.querySelector('.map__pin--main');
-
-var MAP_PIN_MAIN_WIDTH = mapPinMain.clientWidth;
-var MAP_PIN_MAIN_HEIGHT = mapPinMain.clientHeight;
-
 var notice = document.querySelector('.notice');
 var noticeForm = notice.querySelector('.ad-form');
 var noticeFieldsets = notice.querySelectorAll('.ad-form__element');
-var addressInput = notice.querySelector('#address');
 
-// ////////////////
+// //////////
+
+var addressInput = notice.querySelector('#address');
+var typeInput = notice.querySelector('#type');
+var priceInput = notice.querySelector('#price');
+var minAvailablePrice = {
+  bungalo: 0,
+  flat: 1000,
+  house: 5000,
+  palace: 10000
+};
+var timeinInput = notice.querySelector('#timein');
+var timeoutInput = notice.querySelector('#timeout');
+var roomsInput = notice.querySelector('#room_number');
+var capacityInput = notice.querySelector('#capacity');
 
 function getRandomNumber(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -212,8 +219,6 @@ function renderAnnouncement(card) {
   mapBlock.insertBefore(fragment, filtersContainer);
 }
 
-// ///////////////
-
 function disableFormInputs() {
   for (var i = 0; i < noticeFieldsets.length; i++) {
     noticeFieldsets[i].setAttribute('disabled', true);
@@ -236,6 +241,8 @@ function getCoords(element) {
 }
 
 function setAdress() {
+  var MAP_PIN_MAIN_WIDTH = mapPinMain.clientWidth;
+  var MAP_PIN_MAIN_HEIGHT = mapPinMain.clientHeight;
   var adresInputCoords = getCoords(mapPinMain);
   addressInput.value = (adresInputCoords.top - MAP_PIN_MAIN_HEIGHT) + ',' + (adresInputCoords.left - Math.round(MAP_PIN_MAIN_WIDTH / 2));
 }
@@ -301,7 +308,38 @@ function activateMapAndForm() {
   setMapPinsActionOnClick(announcementCards);
 }
 
+// ////////////
+
+function onTypeInputChange() {
+
+  switch (typeInput.value) {
+    case 'bungalo':
+      priceInput.setAttribute('min', minAvailablePrice.bungalo);
+      priceInput.setAttribute('placeholder', minAvailablePrice.bungalo);
+      break;
+    case 'flat':
+      priceInput.setAttribute('min', minAvailablePrice.flat);
+      priceInput.setAttribute('placeholder', minAvailablePrice.flat);
+      break;
+    case 'house':
+      priceInput.setAttribute('min', minAvailablePrice.house);
+      priceInput.setAttribute('placeholder', minAvailablePrice.house);
+      break;
+    case 'palace':
+      priceInput.setAttribute('min', minAvailablePrice.palace);
+      priceInput.setAttribute('placeholder', minAvailablePrice.palace);
+      break;
+  }
+}
+
+function onTimeInputChange(evt) {
+  timeoutInput.selectedIndex = timeinInput.selectedIndex = evt.target.selectedIndex;
+}
+
 disableFormInputs();
 setAdress();
 
 mapPinMain.addEventListener('mouseup', onMapPinMainMouseup);
+typeInput.addEventListener('change', onTypeInputChange);
+timeinInput.addEventListener('change', onTimeInputChange);
+timeoutInput.addEventListener('change', onTimeInputChange);
