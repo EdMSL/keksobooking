@@ -310,36 +310,78 @@ function activateMapAndForm() {
 
 // ////////////
 
-function onTypeInputChange() {
+var NOT_FOR_GUESTS_ROOMS = 100;
+var NO_GUESTS = 0;
 
-  switch (typeInput.value) {
-    case 'bungalo':
-      priceInput.setAttribute('min', minAvailablePrice.bungalo);
-      priceInput.setAttribute('placeholder', minAvailablePrice.bungalo);
-      break;
-    case 'flat':
-      priceInput.setAttribute('min', minAvailablePrice.flat);
-      priceInput.setAttribute('placeholder', minAvailablePrice.flat);
-      break;
-    case 'house':
-      priceInput.setAttribute('min', minAvailablePrice.house);
-      priceInput.setAttribute('placeholder', minAvailablePrice.house);
-      break;
-    case 'palace':
-      priceInput.setAttribute('min', minAvailablePrice.palace);
-      priceInput.setAttribute('placeholder', minAvailablePrice.palace);
-      break;
+function setMinAvailablePriceToPriceInput() {
+  for (var i = 0; i < typeInput.options.length; i++) {
+    if (typeInput.value === apartmentTypeShort[i]) {
+      priceInput.setAttribute('min', minAvailablePrice[apartmentTypeShort[i]]);
+      priceInput.setAttribute('placeholder', minAvailablePrice[apartmentTypeShort[i]]);
+    }
   }
 }
 
-function onTimeInputChange(evt) {
+function setIdenticalTimeToTimeInputs(evt) {
   timeoutInput.selectedIndex = timeinInput.selectedIndex = evt.target.selectedIndex;
+}
+
+function onTimeInputChange(evt) {
+  setIdenticalTimeToTimeInputs(evt);
+}
+
+function setNotForGuestsApartment(quontityOfRooms, listOfCapacitys, availableCapacity) {
+  for (var i = 0; i < roomsInput.options.length; i++) {
+    if (quontityOfRooms > NO_GUESTS) {
+      listOfCapacitys[i].setAttribute('disabled', true);
+    }
+    listOfCapacitys[availableCapacity].removeAttribute('disabled');
+  }
+}
+
+function setMaxAvailableGuests() {
+  var selectedQuontityOfRoomsIndex = roomsInput.selectedIndex;
+  var selectedQuontityOfRooms = +roomsInput.options[selectedQuontityOfRoomsIndex].value;
+  var currentCapasityIndex = capacityInput.options.selectedIndex;
+  var currentCapasityInInput = +capacityInput.options[currentCapasityIndex].value;
+
+  for (var i = 0; i < roomsInput.options.length; i++) {
+    var capacitysOfGuests = capacityInput.options;
+    var currentCapacityGuests = +capacityInput.options[i].value;
+
+    if (currentCapacityGuests > selectedQuontityOfRooms || currentCapacityGuests === NO_GUESTS) {
+      capacitysOfGuests[i].setAttribute('disabled', true);
+    } else {
+      capacitysOfGuests[i].removeAttribute('disabled');
+    }
+
+    if (selectedQuontityOfRooms === NOT_FOR_GUESTS_ROOMS) {
+      setNotForGuestsApartment(selectedQuontityOfRooms, capacitysOfGuests, selectedQuontityOfRoomsIndex);
+      capacityInput.selectedIndex = selectedQuontityOfRoomsIndex;
+    }
+  }
+  if (currentCapasityInInput > selectedQuontityOfRooms || currentCapasityInInput === NO_GUESTS) {
+    capacityInput.selectedIndex = roomsInput.selectedIndex;
+  }
+}
+
+function onRoomInputChange() {
+  setMaxAvailableGuests();
+}
+
+function setAnnoucementFormListeners() {
+  typeInput.addEventListener('change', function () {
+    setMinAvailablePriceToPriceInput();
+  });
+  timeinInput.addEventListener('change', onTimeInputChange);
+  timeoutInput.addEventListener('change', onTimeInputChange);
+  roomsInput.addEventListener('change', onRoomInputChange);
 }
 
 disableFormInputs();
 setAdress();
+setMaxAvailableGuests();
 
 mapPinMain.addEventListener('mouseup', onMapPinMainMouseup);
-typeInput.addEventListener('change', onTypeInputChange);
-timeinInput.addEventListener('change', onTimeInputChange);
-timeoutInput.addEventListener('change', onTimeInputChange);
+
+setAnnoucementFormListeners();
