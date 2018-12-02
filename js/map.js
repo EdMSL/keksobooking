@@ -331,6 +331,10 @@ function setNotForGuestsApartment(quontityOfRooms, listOfCapacitys, availableCap
   }
 }
 
+function isCapasityGuestsMoreThenRooms(capasity, rooms, noGuests) {
+  return capasity > rooms || capasity === noGuests;
+}
+
 function setMaxAvailableGuests() {
   var selectedQuontityOfRoomsIndex = roomsInput.selectedIndex;
   var selectedQuontityOfRooms = +roomsInput.options[selectedQuontityOfRoomsIndex].value;
@@ -341,7 +345,7 @@ function setMaxAvailableGuests() {
     var capacitysOfGuests = capacityInput.options;
     var currentCapacityGuests = +capacityInput.options[i].value;
 
-    if (currentCapacityGuests > selectedQuontityOfRooms || currentCapacityGuests === NO_GUESTS) {
+    if (isCapasityGuestsMoreThenRooms(currentCapacityGuests, selectedQuontityOfRooms, NO_GUESTS)) {
       capacitysOfGuests[i].setAttribute('disabled', true);
     } else {
       capacitysOfGuests[i].removeAttribute('disabled');
@@ -352,7 +356,7 @@ function setMaxAvailableGuests() {
       capacityInput.selectedIndex = selectedQuontityOfRoomsIndex;
     }
   }
-  if (currentCapasityInInput > selectedQuontityOfRooms || currentCapasityInInput === NO_GUESTS) {
+  if (isCapasityGuestsMoreThenRooms(currentCapasityInInput, selectedQuontityOfRooms, NO_GUESTS)) {
     capacityInput.selectedIndex = roomsInput.selectedIndex;
   }
 }
