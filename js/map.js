@@ -1,5 +1,7 @@
 'use strict';
 
+var mapBlock = document.querySelector('.map');
+
 var MAP_Y_MIN = 130;
 var MAP_Y_MAX = 630;
 var MIN_AUTHOR_AVATAR_START_NUMBER = 1;
@@ -10,10 +12,12 @@ var MAX_ROOMS = 5;
 var MAX_GUESTS = 10;
 var MIN_FEATURES_QUANTITY = 1;
 var ESC_KEYCODE = 27;
+var NOT_FOR_GUESTS_ROOMS = 100;
+var NO_GUESTS = 0;
 
-var mapBlock = document.querySelector('.map');
 var map = document.querySelector('.map__pins');
 var mapXmax = map.clientWidth;
+var mapPinMain = mapBlock.querySelector('.map__pin--main');
 var filtersContainer = document.querySelector('.map__filters-container');
 var totalCards = 8;
 var apartmentType = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
@@ -28,20 +32,22 @@ var checkins = ['12:00', '13:00', '14:00'];
 var checkouts = ['12:00', '13:00', '14:00'];
 var apartmentFeatures = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 var apartmentPhotos = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
-
-// ////////////////
-
-var mapPinMain = mapBlock.querySelector('.map__pin--main');
-
-var MAP_PIN_MAIN_WIDTH = mapPinMain.clientWidth;
-var MAP_PIN_MAIN_HEIGHT = mapPinMain.clientHeight;
-
 var notice = document.querySelector('.notice');
 var noticeForm = notice.querySelector('.ad-form');
 var noticeFieldsets = notice.querySelectorAll('.ad-form__element');
 var addressInput = notice.querySelector('#address');
-
-// ////////////////
+var typeInput = notice.querySelector('#type');
+var priceInput = notice.querySelector('#price');
+var minAvailablePrice = {
+  bungalo: 0,
+  flat: 1000,
+  house: 5000,
+  palace: 10000
+};
+var timeinInput = notice.querySelector('#timein');
+var timeoutInput = notice.querySelector('#timeout');
+var roomsInput = notice.querySelector('#room_number');
+var capacityInput = notice.querySelector('#capacity');
 
 function getRandomNumber(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -212,8 +218,6 @@ function renderAnnouncement(card) {
   mapBlock.insertBefore(fragment, filtersContainer);
 }
 
-// ///////////////
-
 function disableFormInputs() {
   for (var i = 0; i < noticeFieldsets.length; i++) {
     noticeFieldsets[i].setAttribute('disabled', true);
@@ -237,7 +241,7 @@ function getCoords(element) {
 
 function setAdress() {
   var adresInputCoords = getCoords(mapPinMain);
-  addressInput.value = (adresInputCoords.top - MAP_PIN_MAIN_HEIGHT) + ',' + (adresInputCoords.left - Math.round(MAP_PIN_MAIN_WIDTH / 2));
+  addressInput.value = (adresInputCoords.top - mapPinMain.clientHeight) + ',' + (adresInputCoords.left - Math.round(mapPinMain.clientWidth / 2));
 }
 
 function onMapPinMainMouseup() {
@@ -301,7 +305,79 @@ function activateMapAndForm() {
   setMapPinsActionOnClick(announcementCards);
 }
 
+function setMinAvailablePriceToPriceInput() {
+  for (var i = 0; i < typeInput.options.length; i++) {
+    if (typeInput.value === apartmentTypeShort[i]) {
+      priceInput.setAttribute('min', minAvailablePrice[apartmentTypeShort[i]]);
+      priceInput.setAttribute('placeholder', minAvailablePrice[apartmentTypeShort[i]]);
+    }
+  }
+}
+
+function setIdenticalTimeToTimeInputs(evt) {
+  timeoutInput.selectedIndex = timeinInput.selectedIndex = evt.target.selectedIndex;
+}
+
+function onTimeInputChange(evt) {
+  setIdenticalTimeToTimeInputs(evt);
+}
+
+function setNotForGuestsApartment(quontityOfRooms, listOfCapacitys, availableCapacity) {
+  for (var i = 0; i < roomsInput.options.length; i++) {
+    if (quontityOfRooms > NO_GUESTS) {
+      listOfCapacitys[i].setAttribute('disabled', true);
+    }
+    listOfCapacitys[availableCapacity].removeAttribute('disabled');
+  }
+}
+
+function isCapasityGuestsMoreThenRooms(capasity, rooms, noGuests) {
+  return capasity > rooms || capasity === noGuests;
+}
+
+function setMaxAvailableGuests() {
+  var selectedQuontityOfRoomsIndex = roomsInput.selectedIndex;
+  var selectedQuontityOfRooms = +roomsInput.options[selectedQuontityOfRoomsIndex].value;
+  var currentCapasityIndex = capacityInput.options.selectedIndex;
+  var currentCapasityInInput = +capacityInput.options[currentCapasityIndex].value;
+
+  for (var i = 0; i < roomsInput.options.length; i++) {
+    var capacitysOfGuests = capacityInput.options;
+    var currentCapacityGuests = +capacityInput.options[i].value;
+
+    if (isCapasityGuestsMoreThenRooms(currentCapacityGuests, selectedQuontityOfRooms, NO_GUESTS)) {
+      capacitysOfGuests[i].setAttribute('disabled', true);
+    } else {
+      capacitysOfGuests[i].removeAttribute('disabled');
+    }
+
+    if (selectedQuontityOfRooms === NOT_FOR_GUESTS_ROOMS) {
+      setNotForGuestsApartment(selectedQuontityOfRooms, capacitysOfGuests, selectedQuontityOfRoomsIndex);
+      capacityInput.selectedIndex = selectedQuontityOfRoomsIndex;
+    }
+  }
+  if (isCapasityGuestsMoreThenRooms(currentCapasityInInput, selectedQuontityOfRooms, NO_GUESTS)) {
+    capacityInput.selectedIndex = roomsInput.selectedIndex;
+  }
+}
+
+function onRoomInputChange() {
+  setMaxAvailableGuests();
+}
+
+function setAnnoucementFormListeners() {
+  typeInput.addEventListener('change', function () {
+    setMinAvailablePriceToPriceInput();
+  });
+  timeinInput.addEventListener('change', onTimeInputChange);
+  timeoutInput.addEventListener('change', onTimeInputChange);
+  roomsInput.addEventListener('change', onRoomInputChange);
+}
+
 disableFormInputs();
 setAdress();
+setMaxAvailableGuests();
 
 mapPinMain.addEventListener('mouseup', onMapPinMainMouseup);
+
+setAnnoucementFormListeners();
