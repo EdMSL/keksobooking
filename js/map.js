@@ -12,6 +12,8 @@ var MAX_ROOMS = 5;
 var MAX_GUESTS = 10;
 var MIN_FEATURES_QUANTITY = 1;
 var ESC_KEYCODE = 27;
+var NOT_FOR_GUESTS_ROOMS = 100;
+var NO_GUESTS = 0;
 
 var map = document.querySelector('.map__pins');
 var mapXmax = map.clientWidth;
@@ -33,9 +35,6 @@ var apartmentPhotos = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'ht
 var notice = document.querySelector('.notice');
 var noticeForm = notice.querySelector('.ad-form');
 var noticeFieldsets = notice.querySelectorAll('.ad-form__element');
-
-// //////////
-
 var addressInput = notice.querySelector('#address');
 var typeInput = notice.querySelector('#type');
 var priceInput = notice.querySelector('#price');
@@ -241,10 +240,8 @@ function getCoords(element) {
 }
 
 function setAdress() {
-  var MAP_PIN_MAIN_WIDTH = mapPinMain.clientWidth;
-  var MAP_PIN_MAIN_HEIGHT = mapPinMain.clientHeight;
   var adresInputCoords = getCoords(mapPinMain);
-  addressInput.value = (adresInputCoords.top - MAP_PIN_MAIN_HEIGHT) + ',' + (adresInputCoords.left - Math.round(MAP_PIN_MAIN_WIDTH / 2));
+  addressInput.value = (adresInputCoords.top - mapPinMain.clientHeight) + ',' + (adresInputCoords.left - Math.round(mapPinMain.clientWidth / 2));
 }
 
 function onMapPinMainMouseup() {
@@ -307,11 +304,6 @@ function activateMapAndForm() {
   relocatePins();
   setMapPinsActionOnClick(announcementCards);
 }
-
-// ////////////
-
-var NOT_FOR_GUESTS_ROOMS = 100;
-var NO_GUESTS = 0;
 
 function setMinAvailablePriceToPriceInput() {
   for (var i = 0; i < typeInput.options.length; i++) {
