@@ -48,6 +48,8 @@ var timeinInput = notice.querySelector('#timein');
 var timeoutInput = notice.querySelector('#timeout');
 var roomsInput = notice.querySelector('#room_number');
 var capacityInput = notice.querySelector('#capacity');
+var isMapActivated = false;
+var startMapPinMainCoords = getCoords(mapPinMain);
 
 function getRandomNumber(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -64,7 +66,7 @@ function generateOffer(cardNumber, coordsX, coordsY) {
   var offer = {};
 
   offer.title = apartmentType[cardNumber];
-  offer.adress = coordsX + ', ' + coordsY;
+  offer.address = coordsX + ', ' + coordsY;
   offer.price = getRandomNumber(MIN_PRICE, MAX_PRICE);
   offer.type = apartmentTypeShort[getRandomNumber(0, apartmentTypeShort.length - 1)];
   offer.rooms = getRandomNumber(MIN_ROOMS, MAX_ROOMS);
@@ -186,7 +188,7 @@ function renderAnnouncement(card) {
   var announcementTemplate = document.querySelector('#card').content.querySelector('.map__card');
   var announcementElement = announcementTemplate.cloneNode(true);
   var announcementTitle = announcementElement.querySelector('.popup__title');
-  var announcementAdress = announcementElement.querySelector('.popup__text--address');
+  var announcementAddress = announcementElement.querySelector('.popup__text--address');
   var announcementPrice = announcementElement.querySelector('.popup__text--price');
   var announcementType = announcementElement.querySelector('.popup__type');
   var announcementCapacity = announcementElement.querySelector('.popup__text--capacity');
@@ -200,7 +202,7 @@ function renderAnnouncement(card) {
   var fragment = document.createDocumentFragment();
 
   announcementTitle.textContent = card.offer.title;
-  announcementAdress.textContent = card.offer.adress;
+  announcementAddress.textContent = card.offer.address;
   announcementPrice.textContent = card.offer.price + '₽/ночь';
   announcementType.textContent = apartmentTypeShortPrint[card.offer.type];
   announcementCapacity.textContent = card.offer.rooms + ' комнаты для ' + card.offer.guests + ' гостей.';
@@ -239,13 +241,8 @@ function getCoords(element) {
   };
 }
 
-function setAdress() {
-  var adresInputCoords = getCoords(mapPinMain);
-  addressInput.value = (adresInputCoords.top - mapPinMain.clientHeight) + ',' + (adresInputCoords.left - Math.round(mapPinMain.clientWidth / 2));
-}
-
-function onMapPinMainMouseup() {
-  activateMapAndForm();
+function setAddress(coords) {
+  addressInput.value = (coords.left + Math.round(mapPinMain.offsetWidth / 2)) + ',' + (coords.top + mapPinMain.offsetHeight);
 }
 
 function closeAnnouncement() {
@@ -375,9 +372,55 @@ function setAnnoucementFormListeners() {
 }
 
 disableFormInputs();
-setAdress();
+setAddress(startMapPinMainCoords);
 setMaxAvailableGuests();
 
-mapPinMain.addEventListener('mouseup', onMapPinMainMouseup);
+mapPinMain.addEventListener('mousedown', function (evtUp) {
+  evtUp.preventDefault();
+  if (!isMapActivated) {
+    activateMapAndForm();
+    isMapActivated = true;
+  }
+
+  var pin = evtUp.target;
+  var pinCoords = getCoords(pin);
+  var mapCoords = getCoords(map);
+  var shiftX = evtUp.pageX - pinCoords.left;
+  var shiftY = evtUp.pageY - pinCoords.top;
+
+  pin.style.zIndex = 2;
+
+  document.onmousemove = function (evtMove) {
+    moveTo(pin, evtMove);
+  };
+
+  document.onmouseup = function () {
+    document.onmousemove = pin.onmouseup = null;
+  };
+
+  function moveTo(element, evt) {
+    var newLeft = evt.pageX - mapCoords.left - shiftX;
+    var newTop = evt.pageY - mapCoords.top - shiftY;
+
+    if (newLeft < 0) {
+      newLeft = 0;
+    }
+    if (newLeft > mapBlock.offsetWidth - pin.offsetWidth) {
+      newLeft = mapBlock.offsetWidth - pin.offsetWidth;
+    }
+    if (newTop < MAP_Y_MIN - pin.offsetHeight) {
+      newTop = MAP_Y_MIN - pin.offsetHeight;
+    }
+    if (newTop > MAP_Y_MAX - pin.offsetHeight) {
+      newTop = MAP_Y_MAX - pin.offsetHeight;
+    }
+
+    element.style.left = newLeft + 'px';
+    element.style.top = newTop + 'px';
+    pinCoords.left = newLeft;
+    pinCoords.top = newTop;
+    setAddress(pinCoords);
+  }
+});
 
 setAnnoucementFormListeners();
