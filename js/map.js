@@ -382,7 +382,7 @@ mapPinMain.addEventListener('mousedown', function (evtUp) {
     isMapActivated = true;
   }
 
-  var pin = evtUp.target;
+  var pin = mapPinMain;
   var pinCoords = getCoords(pin);
   var mapCoords = getCoords(map);
   var shiftX = evtUp.pageX - pinCoords.left;
