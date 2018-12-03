@@ -371,31 +371,38 @@ function setAnnoucementFormListeners() {
   roomsInput.addEventListener('change', onRoomInputChange);
 }
 
+function setPosition(element, coordsX, coordsY) {
+  element.style.left = coordsX + 'px';
+  element.style.top = coordsY + 'px';
+}
+
 disableFormInputs();
 setAddress(startMapPinMainCoords);
 setMaxAvailableGuests();
 
-mapPinMain.addEventListener('mousedown', function (evtUp) {
-  evtUp.preventDefault();
+mapPinMain.addEventListener('mousedown', function (evtDown) {
+  evtDown.preventDefault();
   if (!isMapActivated) {
     activateMapAndForm();
     isMapActivated = true;
   }
 
-  var pin = mapPinMain;
+  var pin = evtDown.currentTarget;
   var pinCoords = getCoords(pin);
   var mapCoords = getCoords(map);
-  var shiftX = evtUp.pageX - pinCoords.left;
-  var shiftY = evtUp.pageY - pinCoords.top;
+  var shiftX = evtDown.pageX - pinCoords.left;
+  var shiftY = evtDown.pageY - pinCoords.top;
 
   pin.style.zIndex = 2;
 
-  document.onmousemove = function (evtMove) {
+  var onMouseMove = function (evtMove) {
     moveTo(pin, evtMove);
   };
 
-  document.onmouseup = function () {
-    document.onmousemove = pin.onmouseup = null;
+  var onMouseUp = function (evtUp) {
+    evtUp.preventDefault();
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
   };
 
   function moveTo(element, evt) {
@@ -415,12 +422,13 @@ mapPinMain.addEventListener('mousedown', function (evtUp) {
       newTop = MAP_Y_MAX - pin.offsetHeight;
     }
 
-    element.style.left = newLeft + 'px';
-    element.style.top = newTop + 'px';
+    setPosition(element, newLeft, newTop);
     pinCoords.left = newLeft;
     pinCoords.top = newTop;
     setAddress(pinCoords);
   }
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
 });
 
 setAnnoucementFormListeners();
