@@ -51,10 +51,6 @@ var capacityInput = notice.querySelector('#capacity');
 var isMapActivated = false;
 var startMapPinMainCoords = getCoords(mapPinMain);
 
-function getRandomNumber(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
 function generateAuthor(authorNumber) {
   var author = {};
   author.avatar = 'img/avatars/user0' + (MIN_AUTHOR_AVATAR_START_NUMBER + authorNumber) + '.png';
@@ -67,15 +63,15 @@ function generateOffer(cardNumber, coordsX, coordsY) {
 
   offer.title = apartmentType[cardNumber];
   offer.address = coordsX + ', ' + coordsY;
-  offer.price = getRandomNumber(MIN_PRICE, MAX_PRICE);
-  offer.type = apartmentTypeShort[getRandomNumber(0, apartmentTypeShort.length - 1)];
-  offer.rooms = getRandomNumber(MIN_ROOMS, MAX_ROOMS);
-  offer.guests = getRandomNumber(1, MAX_GUESTS);
-  offer.checkin = checkins[getRandomNumber(0, checkins.length - 1)];
-  offer.checkout = checkouts[getRandomNumber(0, checkouts.length - 1)];
+  offer.price = window.utils.getRandomNumber(MIN_PRICE, MAX_PRICE);
+  offer.type = window.utils.getRandomValueFromArray(apartmentTypeShort);
+  offer.rooms = window.utils.getRandomNumber(MIN_ROOMS, MAX_ROOMS);
+  offer.guests = window.utils.getRandomNumber(1, MAX_GUESTS);
+  offer.checkin = window.utils.getRandomValueFromArray(checkins);
+  offer.checkout = window.utils.getRandomValueFromArray(checkouts);
 
   offer.features = [];
-  for (var i = 0; i < getRandomNumber(MIN_FEATURES_QUANTITY, apartmentFeatures.length); i++) {
+  for (var i = 0; i < window.utils.getRandomNumber(MIN_FEATURES_QUANTITY, apartmentFeatures.length); i++) {
     offer.features.push(apartmentFeatures[i]);
   }
 
@@ -91,8 +87,8 @@ function generateOffer(cardNumber, coordsX, coordsY) {
 
 function generateLocationCoords() {
   var coords = {};
-  coords.x = getRandomNumber(0, mapXmax);
-  coords.y = getRandomNumber(MAP_Y_MIN, MAP_Y_MAX);
+  coords.x = window.utils.getRandomNumber(0, mapXmax);
+  coords.y = window.utils.getRandomNumber(MAP_Y_MIN, MAP_Y_MAX);
 
   return coords;
 }
