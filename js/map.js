@@ -2,36 +2,19 @@
 
 var mapBlock = document.querySelector('.map');
 
-var MAP_Y_MIN = 130;
-var MAP_Y_MAX = 630;
-var MIN_AUTHOR_AVATAR_START_NUMBER = 1;
-var MIN_PRICE = 1000;
-var MAX_PRICE = 1000000;
-var MIN_ROOMS = 1;
-var MAX_ROOMS = 5;
-var MAX_GUESTS = 10;
-var MIN_FEATURES_QUANTITY = 1;
-var ESC_KEYCODE = 27;
 var NOT_FOR_GUESTS_ROOMS = 100;
 var NO_GUESTS = 0;
 
 var map = document.querySelector('.map__pins');
-var mapXmax = map.clientWidth;
 var mapPinMain = mapBlock.querySelector('.map__pin--main');
 var filtersContainer = document.querySelector('.map__filters-container');
 var totalCards = 8;
-var apartmentType = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
-var apartmentTypeShort = ['palace', 'flat', 'house', 'bungalo'];
 var apartmentTypeShortPrint = {
   palace: 'Дворец',
   flat: 'Квартира',
   house: 'Дом',
   bungalo: 'Бунгало'
 };
-var checkins = ['12:00', '13:00', '14:00'];
-var checkouts = ['12:00', '13:00', '14:00'];
-var apartmentFeatures = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
-var apartmentPhotos = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
 var notice = document.querySelector('.notice');
 var noticeForm = notice.querySelector('.ad-form');
 var noticeFieldsets = notice.querySelectorAll('.ad-form__element');
@@ -49,71 +32,7 @@ var timeoutInput = notice.querySelector('#timeout');
 var roomsInput = notice.querySelector('#room_number');
 var capacityInput = notice.querySelector('#capacity');
 var isMapActivated = false;
-var startMapPinMainCoords = getCoords(mapPinMain);
-
-function generateAuthor(authorNumber) {
-  var author = {};
-  author.avatar = 'img/avatars/user0' + (MIN_AUTHOR_AVATAR_START_NUMBER + authorNumber) + '.png';
-
-  return author;
-}
-
-function generateOffer(cardNumber, coordsX, coordsY) {
-  var offer = {};
-
-  offer.title = apartmentType[cardNumber];
-  offer.address = coordsX + ', ' + coordsY;
-  offer.price = window.utils.getRandomNumber(MIN_PRICE, MAX_PRICE);
-  offer.type = window.utils.getRandomValueFromArray(apartmentTypeShort);
-  offer.rooms = window.utils.getRandomNumber(MIN_ROOMS, MAX_ROOMS);
-  offer.guests = window.utils.getRandomNumber(1, MAX_GUESTS);
-  offer.checkin = window.utils.getRandomValueFromArray(checkins);
-  offer.checkout = window.utils.getRandomValueFromArray(checkouts);
-
-  offer.features = [];
-  for (var i = 0; i < window.utils.getRandomNumber(MIN_FEATURES_QUANTITY, apartmentFeatures.length); i++) {
-    offer.features.push(apartmentFeatures[i]);
-  }
-
-  offer.description = '';
-
-  offer.photos = [];
-  for (var j = 0; j < apartmentPhotos.length; j++) {
-    offer.photos.push(apartmentPhotos[j]);
-  }
-
-  return offer;
-}
-
-function generateLocationCoords() {
-  var coords = {};
-  coords.x = window.utils.getRandomNumber(0, mapXmax);
-  coords.y = window.utils.getRandomNumber(MAP_Y_MIN, MAP_Y_MAX);
-
-  return coords;
-}
-
-function generateCardData(cardNumber) {
-  var objElement = {};
-  var apartnentCoords = generateLocationCoords();
-  var coordsX = apartnentCoords.x;
-  var coordsY = apartnentCoords.y;
-  objElement.author = generateAuthor(cardNumber);
-  objElement.offer = generateOffer(cardNumber, coordsX, coordsY);
-  objElement.location = apartnentCoords;
-
-  return objElement;
-}
-
-function generateCards(numberOfCards) {
-  var cardsArr = [];
-
-  for (var i = 0; i < numberOfCards; i++) {
-    cardsArr.push(generateCardData(i));
-  }
-
-  return cardsArr;
-}
+var startMapPinMainCoords = window.utils.getElementCoords(mapPinMain);
 
 function renderMapPins(cards) {
   var pinTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
@@ -142,40 +61,20 @@ function relocatePins() {
   }
 }
 
-function removeListElements(list) {
-  list.innerHTML = '';
-}
-
-function generateClassModificator(className, modificator, index) {
-  if (Array.isArray(modificator)) {
-    return className + '--' + modificator[index];
-  } else {
-    return className + '--' + modificator;
-  }
-}
-
-function changeElementAttribute(element, attribute, value, index) {
-  if (Array.isArray(value)) {
-    element.setAttribute(attribute, value[index]);
-  } else {
-    element.setAttribute(attribute, value);
-  }
-}
-
 function generateFeaturesElements(featuresList, quontityOfElements, element, className, modificator) {
-  removeListElements(featuresList);
+  window.utils.removeListElements(featuresList);
   for (var i = 0; i < quontityOfElements; i++) {
     var newElement = element.cloneNode(true);
-    newElement.className = className + ' ' + generateClassModificator(className, modificator, i);
+    newElement.className = className + ' ' + window.utils.generateClassModificator(className, modificator, i);
     featuresList.appendChild(newElement);
   }
 }
 
 function generateOfferPhotosElements(photosList, quontityOfElements, element, attribute, value) {
-  removeListElements(photosList);
+  window.utils.removeListElements(photosList);
   for (var i = 0; i < quontityOfElements; i++) {
     var newElement = element.cloneNode(true);
-    changeElementAttribute(newElement, attribute, value, i);
+    window.utils.changeElementAttribute(newElement, attribute, value, i);
     photosList.appendChild(newElement);
   }
 }
@@ -228,15 +127,6 @@ function enableFormInputs() {
   }
 }
 
-function getCoords(element) {
-  var box = element.getBoundingClientRect();
-
-  return {
-    top: Math.round(box.top + pageYOffset),
-    left: Math.round(box.left + pageXOffset)
-  };
-}
-
 function setAddress(coords) {
   addressInput.value = (coords.left + Math.ceil(mapPinMain.offsetWidth / 2)) + ',' + (coords.top + mapPinMain.offsetHeight);
 }
@@ -247,9 +137,7 @@ function closeAnnouncement() {
 }
 
 var onAnnouncementEscPress = function (evt) {
-  if (evt.keyCode === ESC_KEYCODE) {
-    closeAnnouncement();
-  }
+  window.utils.isEscEvent(evt, closeAnnouncement);
 };
 
 function onCloseButtonClick() {
@@ -287,7 +175,7 @@ function setMapPinsActionOnClick(annocements) {
 }
 
 function activateMapAndForm() {
-  var announcementCards = generateCards(totalCards);
+  var announcementCards = window.generateCards(totalCards);
 
   mapBlock.classList.remove('map--faded');
   noticeForm.classList.remove('ad-form--disabled');
@@ -300,9 +188,9 @@ function activateMapAndForm() {
 
 function setMinAvailablePriceToPriceInput() {
   for (var i = 0; i < typeInput.options.length; i++) {
-    if (typeInput.value === apartmentTypeShort[i]) {
-      priceInput.setAttribute('min', minAvailablePrice[apartmentTypeShort[i]]);
-      priceInput.setAttribute('placeholder', minAvailablePrice[apartmentTypeShort[i]]);
+    if (typeInput.value === window.data.apartmentTypeShort[i]) {
+      priceInput.setAttribute('min', minAvailablePrice[window.data.apartmentTypeShort[i]]);
+      priceInput.setAttribute('placeholder', minAvailablePrice[window.data.apartmentTypeShort[i]]);
     }
   }
 }
@@ -384,8 +272,8 @@ mapPinMain.addEventListener('mousedown', function (evtDown) {
   }
 
   var pin = evtDown.currentTarget;
-  var pinCoords = getCoords(pin);
-  var mapCoords = getCoords(map);
+  var pinCoords = window.utils.getElementCoords(pin);
+  var mapCoords = window.utils.getElementCoords(map);
   var shiftX = evtDown.pageX - pinCoords.left;
   var shiftY = evtDown.pageY - pinCoords.top;
 
@@ -411,11 +299,11 @@ mapPinMain.addEventListener('mousedown', function (evtDown) {
     if (newLeft > mapBlock.offsetWidth - Math.ceil(pin.offsetWidth / 2)) {
       newLeft = mapBlock.offsetWidth - Math.ceil(pin.offsetWidth / 2);
     }
-    if (newTop < MAP_Y_MIN - pin.offsetHeight) {
-      newTop = MAP_Y_MIN - pin.offsetHeight;
+    if (newTop < window.data.MAP_Y_MIN - pin.offsetHeight) {
+      newTop = window.data.MAP_Y_MIN - pin.offsetHeight;
     }
-    if (newTop > MAP_Y_MAX - pin.offsetHeight) {
-      newTop = MAP_Y_MAX - pin.offsetHeight;
+    if (newTop > window.data.MAP_Y_MAX - pin.offsetHeight) {
+      newTop = window.data.MAP_Y_MAX - pin.offsetHeight;
     }
 
     setPosition(element, newLeft, newTop);
