@@ -242,7 +242,7 @@ function getCoords(element) {
 }
 
 function setAddress(coords) {
-  addressInput.value = (coords.left + Math.round(mapPinMain.offsetWidth / 2)) + ',' + (coords.top + mapPinMain.offsetHeight);
+  addressInput.value = (coords.left + Math.ceil(mapPinMain.offsetWidth / 2)) + ',' + (coords.top + mapPinMain.offsetHeight);
 }
 
 function closeAnnouncement() {
@@ -409,11 +409,11 @@ mapPinMain.addEventListener('mousedown', function (evtDown) {
     var newLeft = evt.pageX - mapCoords.left - shiftX;
     var newTop = evt.pageY - mapCoords.top - shiftY;
 
-    if (newLeft < 0) {
-      newLeft = 0;
+    if (newLeft < 0 - Math.ceil(pin.offsetWidth / 2)) {
+      newLeft = 0 - Math.ceil(pin.offsetWidth / 2);
     }
-    if (newLeft > mapBlock.offsetWidth - pin.offsetWidth) {
-      newLeft = mapBlock.offsetWidth - pin.offsetWidth;
+    if (newLeft > mapBlock.offsetWidth - Math.ceil(pin.offsetWidth / 2)) {
+      newLeft = mapBlock.offsetWidth - Math.ceil(pin.offsetWidth / 2);
     }
     if (newTop < MAP_Y_MIN - pin.offsetHeight) {
       newTop = MAP_Y_MIN - pin.offsetHeight;
