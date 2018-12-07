@@ -5,6 +5,7 @@
   var NO_GUESTS = 0;
 
   var notice = window.data.notice;
+  var titleInput = notice.querySelector('#title');
   var typeInput = notice.querySelector('#type');
   var priceInput = notice.querySelector('#price');
   var minAvailablePrice = {
@@ -17,6 +18,27 @@
   var timeoutInput = notice.querySelector('#timeout');
   var roomsInput = notice.querySelector('#room_number');
   var capacityInput = notice.querySelector('#capacity');
+  var descriptionInput = notice.querySelector('#description');
+  var featuresInputs = notice.querySelectorAll('.features input[type="checkbox"]');
+  var selects = notice.querySelectorAll('select');
+  var selectsDefaultValues = getDefaultSelectsOptions(selects);
+
+  function getSelectedOptionOnSelect(select) {
+    for (var i = 0; i < select.options.length; i++) {
+      if (select.options[i].selected) {
+        var selectedOption = select.options[i].index;
+      }
+    }
+    return selectedOption;
+  }
+
+  function getDefaultSelectsOptions(selectsList) {
+    var selectedValues = [];
+    for (var i = 0; i < selectsList.length; i++) {
+      selectedValues.push(getSelectedOptionOnSelect(selectsList[i]));
+    }
+    return selectedValues;
+  }
 
   function setMinAvailablePriceToPriceInput() {
     for (var i = 0; i < typeInput.options.length; i++) {
@@ -78,6 +100,26 @@
     setMaxAvailableGuests();
   }
 
+  function setSelectsDefaultValue() {
+    for (var i = 0; i < selects.length; i++) {
+      selects[i].options.selectedIndex = selectsDefaultValues[i];
+    }
+  }
+
+  function resetFeatures() {
+    for (var i = 0; i < featuresInputs.length; i++) {
+      featuresInputs[i].checked = false;
+    }
+  }
+
+  function setDefaultInputsValue() {
+    setSelectsDefaultValue();
+    resetFeatures();
+    titleInput.value = '';
+    priceInput.value = null;
+    descriptionInput.value = '';
+  }
+
   function setAnnoucementFormListeners() {
     typeInput.addEventListener('change', function () {
       setMinAvailablePriceToPriceInput();
@@ -89,6 +131,7 @@
 
   window.form = {
     setAnnoucementFormListeners: setAnnoucementFormListeners,
-    setMaxAvailableGuests: setMaxAvailableGuests
+    setMaxAvailableGuests: setMaxAvailableGuests,
+    setDefaultInputsValue: setDefaultInputsValue
   };
 })();

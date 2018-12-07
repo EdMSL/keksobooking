@@ -2,13 +2,20 @@
 
 (function () {
   var mapPinMain = window.data.mapBlock.querySelector('.map__pin--main');
-  var totalCards = 8;
   var notice = window.data.notice;
   var noticeForm = notice.querySelector('.ad-form');
   var noticeFieldsets = notice.querySelectorAll('.ad-form__element');
   var addressInput = notice.querySelector('#address');
   var isMapActivated = false;
-  var startMapPinMainCoords = window.utils.getElementCoords(mapPinMain);
+  var mapCoords = window.utils.getElementCoords(window.data.map);
+  var startMapPinMainCoords = getStartMapPinMainCoords();
+
+  function getStartMapPinMainCoords() {
+    return {
+      top: window.utils.getElementCoords(mapPinMain).top - mapCoords.top,
+      left: window.utils.getElementCoords(mapPinMain).left - mapCoords.left,
+    };
+  }
 
   function relocatePins() {
     var pins = window.data.mapBlock.querySelectorAll('.map__pin:not(.map__pin--main)');
@@ -35,9 +42,13 @@
     addressInput.value = (coords.left + Math.ceil(mapPinMain.offsetWidth / 2)) + ',' + (coords.top + mapPinMain.offsetHeight);
   }
 
-  function closeAnnouncement() {
-    var element = window.data.mapBlock.querySelector('.map__card');
+  function closeAnnouncement(annocement, oldPin) {
+    var element = annocement ? annocement : window.data.mapBlock.querySelector('.map__card');
+    var pin = oldPin ? oldPin : window.data.mapBlock.querySelector('.map__pin--active');
+
     window.data.mapBlock.removeChild(element);
+    document.removeEventListener('keydown', onAnnouncementEscPress);
+    pin.classList.remove('map__pin--active');
   }
 
   var onAnnouncementEscPress = function (evt) {
@@ -46,7 +57,6 @@
 
   function onCloseButtonClick() {
     closeAnnouncement();
-    document.removeEventListener('keydown', onAnnouncementEscPress);
   }
 
   function setCloseButtonActionOnClick(element) {
@@ -57,9 +67,10 @@
   function onMapPinClick(currentPin, currentAnnouncement) {
     currentPin.addEventListener('click', function () {
       var oldAnnocement = window.data.mapBlock.querySelector('.map__card');
+      var oldPin = window.data.mapBlock.querySelector('.map__pin--active');
 
       if (oldAnnocement) {
-        window.data.mapBlock.removeChild(oldAnnocement);
+        closeAnnouncement(oldAnnocement, oldPin);
       }
 
       window.render.renderAnnouncement(currentAnnouncement);
@@ -67,27 +78,46 @@
       var newAnnocement = window.data.mapBlock.querySelector('.map__card');
       setCloseButtonActionOnClick(newAnnocement);
       document.addEventListener('keydown', onAnnouncementEscPress);
+      currentPin.classList.add('map__pin--active');
     });
   }
 
   function setMapPinsActionOnClick(annocements) {
-    var mapPin = window.data.mapBlock.querySelectorAll('.map__pin:not(.map__pin--main)');
+    var mapPins = window.data.mapBlock.querySelectorAll('.map__pin:not(.map__pin--main)');
 
     for (var i = 0; i < annocements.length; i++) {
-      onMapPinClick(mapPin[i], annocements[i]);
+      onMapPinClick(mapPins[i], annocements[i]);
     }
   }
 
-  function activateMapAndForm() {
-    var announcementCards = window.generateCards(totalCards);
+  function onSuccesAnnouncementsLoad(announcementCards) {
+    window.render.renderMapPins(announcementCards);
+    setMapPinsActionOnClick(announcementCards);
+  }
 
+  function onErrorAnnouncementsLoad(message) {
+    console.log(message);
+  }
+
+  function activateMapAndForm() {
     window.data.mapBlock.classList.remove('map--faded');
     noticeForm.classList.remove('ad-form--disabled');
 
+    window.backend.load('https://js.dump.academy/keksobooking/data', onSuccesAnnouncementsLoad, onErrorAnnouncementsLoad);
     enableFormInputs();
-    window.render.renderMapPins(announcementCards);
     relocatePins();
-    setMapPinsActionOnClick(announcementCards);
+  }
+
+  function deactevateMapAndForm() {
+    // var pins =
+    // for (var i = 0; i < )
+    window.data.mapBlock.classList.add('map--faded');
+    noticeForm.classList.add('ad-form--disabled');
+    disableFormInputs();
+    setPosition(mapPinMain, startMapPinMainCoords.left, startMapPinMainCoords.top);
+    setAddress(startMapPinMainCoords);
+    window.form.setDefaultInputsValue();
+    isMapActivated = false;
   }
 
   function setPosition(element, coordsX, coordsY) {
@@ -95,11 +125,7 @@
     element.style.top = coordsY + 'px';
   }
 
-  disableFormInputs();
-  setAddress(startMapPinMainCoords);
-  window.form.setMaxAvailableGuests();
-
-  mapPinMain.addEventListener('mousedown', function (evtDown) {
+  var onMapPinMainMousedown = function (evtDown) {
     evtDown.preventDefault();
     if (!isMapActivated) {
       activateMapAndForm();
@@ -108,7 +134,6 @@
 
     var pin = evtDown.currentTarget;
     var pinCoords = window.utils.getElementCoords(pin);
-    var mapCoords = window.utils.getElementCoords(window.data.map);
     var shiftX = evtDown.pageX - pinCoords.left;
     var shiftY = evtDown.pageY - pinCoords.top;
 
@@ -148,8 +173,28 @@
     }
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
+  };
+
+  function onSuccesAnnouncementSave() {
+    deactevateMapAndForm();
+  }
+
+  function onErrorAnnouncementSave(message) {
+    console.log(message);
+  }
+
+  disableFormInputs();
+  setAddress(startMapPinMainCoords);
+  window.form.setMaxAvailableGuests();
+
+  mapPinMain.addEventListener('mousedown', onMapPinMainMousedown);
+
+  noticeForm.addEventListener('submit', function (evt) {
+    window.backend.save('https://js.dump.academy/keksobooking', new FormData(noticeForm), onSuccesAnnouncementSave, onErrorAnnouncementSave);
+    evt.preventDefault();
   });
 
   window.form.setAnnoucementFormListeners();
+
 })();
 
