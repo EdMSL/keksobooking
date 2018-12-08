@@ -115,7 +115,7 @@
     window.data.mapBlock.classList.remove('map--faded');
     noticeForm.classList.remove('ad-form--disabled');
 
-    window.backend.load('https://js.dump.academy/keksobooking/dat', onSuccesAnnouncementsLoad, onErrorAnnouncementsLoad);
+    window.backend.load('https://js.dump.academy/keksobooking/data', onSuccesAnnouncementsLoad, onErrorAnnouncementsLoad);
     enableFormInputs();
   }
 
