@@ -6,6 +6,7 @@
   var noticeForm = notice.querySelector('.ad-form');
   var noticeFieldsets = notice.querySelectorAll('.ad-form__element');
   var addressInput = notice.querySelector('#address');
+  var resetMapButton = window.data.notice.querySelector('.ad-form__reset');
   var isMapActivated = false;
   var mapCoords = window.utils.getElementCoords(window.data.map);
   var startMapPinMainCoords = getStartMapPinMainCoords();
@@ -15,15 +16,6 @@
       top: window.utils.getElementCoords(mapPinMain).top - mapCoords.top,
       left: window.utils.getElementCoords(mapPinMain).left - mapCoords.left,
     };
-  }
-
-  function relocatePins() {
-    var pins = window.data.mapBlock.querySelectorAll('.map__pin:not(.map__pin--main)');
-
-    for (var i = 0; i < pins.length; i++) {
-      pins[i].style.left = parseInt(pins[i].style.left, 10) - pins[i].offsetWidth / 2 + 'px';
-      pins[i].style.top = parseInt(pins[i].style.top, 10) - pins[i].offsetHeight + 'px';
-    }
   }
 
   function disableFormInputs() {
@@ -46,12 +38,15 @@
     var element = annocement ? annocement : window.data.mapBlock.querySelector('.map__card');
     var pin = oldPin ? oldPin : window.data.mapBlock.querySelector('.map__pin--active');
 
-    window.data.mapBlock.removeChild(element);
-    document.removeEventListener('keydown', onAnnouncementEscPress);
-    pin.classList.remove('map__pin--active');
+    if (element) {
+      window.data.mapBlock.removeChild(element);
+      document.removeEventListener('keydown', onAnnouncementEscPress);
+      pin.classList.remove('map__pin--active');
+    }
   }
 
   var onAnnouncementEscPress = function (evt) {
+    evt.preventDefault();
     window.utils.isEscEvent(evt, closeAnnouncement);
   };
 
@@ -82,41 +77,61 @@
     });
   }
 
-  function setMapPinsActionOnClick(annocements) {
-    var mapPins = window.data.mapBlock.querySelectorAll('.map__pin:not(.map__pin--main)');
-
+  function setMapPinsActionOnClick(pins, annocements) {
     for (var i = 0; i < annocements.length; i++) {
-      onMapPinClick(mapPins[i], annocements[i]);
+      onMapPinClick(pins[i], annocements[i]);
+    }
+  }
+
+  function relocatePins(pins) {
+    for (var i = 0; i < pins.length; i++) {
+      pins[i].style.left = parseInt(pins[i].style.left, 10) - pins[i].offsetWidth / 2 + 'px';
+      pins[i].style.top = parseInt(pins[i].style.top, 10) - pins[i].offsetHeight + 'px';
     }
   }
 
   function onSuccesAnnouncementsLoad(announcementCards) {
-    window.render.renderMapPins(announcementCards);
-    setMapPinsActionOnClick(announcementCards);
+    var loadedAnnoucementsCards = announcementCards;
+    window.render.renderMapPins(loadedAnnoucementsCards);
+    var mapPins = window.data.mapBlock.querySelectorAll('.map__pin:not(.map__pin--main)');
+    setMapPinsActionOnClick(mapPins, loadedAnnoucementsCards);
+    relocatePins(mapPins);
+
+    window.mapPins = mapPins;
   }
 
   function onErrorAnnouncementsLoad(message) {
-    console.log(message);
+    var errorBlock = document.createElement('div');
+    errorBlock.id = 'error-block';
+    errorBlock.style = 'z-index: 5; font-size: 15px; background-color: red; color: white; padding: 5px;';
+    errorBlock.textContent = message;
+    errorBlock.style.position = 'fixed';
+    errorBlock.style.left = 0;
+    errorBlock.style.top = 0;
+    document.body.insertAdjacentElement('afterbegin', errorBlock);
   }
 
   function activateMapAndForm() {
     window.data.mapBlock.classList.remove('map--faded');
     noticeForm.classList.remove('ad-form--disabled');
 
-    window.backend.load('https://js.dump.academy/keksobooking/data', onSuccesAnnouncementsLoad, onErrorAnnouncementsLoad);
+    window.backend.load('https://js.dump.academy/keksobooking/dat', onSuccesAnnouncementsLoad, onErrorAnnouncementsLoad);
     enableFormInputs();
-    relocatePins();
   }
 
-  function deactevateMapAndForm() {
-    // var pins =
-    // for (var i = 0; i < )
+  function deactivateMapAndForm() {
     window.data.mapBlock.classList.add('map--faded');
     noticeForm.classList.add('ad-form--disabled');
     disableFormInputs();
     setPosition(mapPinMain, startMapPinMainCoords.left, startMapPinMainCoords.top);
     setAddress(startMapPinMainCoords);
     window.form.setDefaultInputsValue();
+    closeAnnouncement();
+
+    for (var i = 0; i < window.mapPins.length; i++) {
+      window.data.map.removeChild(window.mapPins[i]);
+    }
+
     isMapActivated = false;
   }
 
@@ -175,12 +190,55 @@
     document.addEventListener('mouseup', onMouseUp);
   };
 
-  function onSuccesAnnouncementSave() {
-    deactevateMapAndForm();
+  function closeSuccessWindow() {
+    var successWindow = window.data.mapBlock.querySelector('.success');
+    window.data.mapBlock.removeChild(successWindow);
+    document.removeEventListener('keydown', onSuccessWindowEscPress);
+    document.removeEventListener('click', onSuccessWindowClick);
   }
 
-  function onErrorAnnouncementSave(message) {
-    console.log(message);
+  var onSuccessWindowEscPress = function (evt) {
+    evt.preventDefault();
+    window.utils.isEscEvent(evt, closeSuccessWindow);
+  };
+
+  var onSuccessWindowClick = function () {
+    closeSuccessWindow();
+  };
+
+  function onSuccesAnnouncementSave() {
+    deactivateMapAndForm();
+    window.render.renderSuccessWindow();
+    document.addEventListener('keydown', onSuccessWindowEscPress);
+    document.addEventListener('click', onSuccessWindowClick);
+  }
+
+  function closeErrorWindow() {
+    var errorWindow = window.data.mapBlock.querySelector('.error');
+    window.data.mapBlock.removeChild(errorWindow);
+    document.removeEventListener('keydown', onErrorWindowEscPress);
+    document.removeEventListener('click', onErrorWindowClick);
+  }
+
+  var onErrorWindowEscPress = function (evt) {
+    evt.preventDefault();
+    window.utils.isEscEvent(evt, closeErrorWindow);
+  };
+
+  var onErrorWindowClick = function () {
+    closeErrorWindow();
+  };
+
+  var onErrorCloseButtonClick = function () {
+    closeErrorWindow();
+  };
+
+  function onErrorAnnouncementSave() {
+    window.render.renderErrorWindow();
+    var errorCloseButton = window.data.mapBlock.querySelector('.error__button');
+    document.addEventListener('keydown', onErrorWindowEscPress);
+    document.addEventListener('click', onErrorWindowClick);
+    errorCloseButton.addEventListener('click', onErrorCloseButtonClick);
   }
 
   disableFormInputs();
@@ -194,7 +252,10 @@
     evt.preventDefault();
   });
 
-  window.form.setAnnoucementFormListeners();
+  resetMapButton.addEventListener('click', function () {
+    deactivateMapAndForm();
+  });
 
+  window.form.setAnnoucementFormListeners();
 })();
 

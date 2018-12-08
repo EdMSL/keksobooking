@@ -26,6 +26,10 @@
         pinImg.src = cards[i].author.avatar;
 
         fragment.appendChild(pinElement);
+      } else {
+        // удалим элемент, если в нем нет offer
+        cards.splice(i, 1);
+        i--;
       }
     }
     map.appendChild(fragment);
@@ -100,8 +104,22 @@
     mapBlock.insertBefore(fragment, filtersContainer);
   }
 
+  function renderSuccessWindow() {
+    var successTemplate = document.querySelector('#success').content.querySelector('.success');
+    var successWindow = successTemplate.cloneNode(true);
+    mapBlock.insertBefore(successWindow, map);
+  }
+
+  function renderErrorWindow() {
+    var errorTemplate = document.querySelector('#error').content.querySelector('.error');
+    var errorWindow = errorTemplate.cloneNode(true);
+    mapBlock.insertBefore(errorWindow, map);
+  }
+
   window.render = {
     renderMapPins: renderMapPins,
-    renderAnnouncement: renderAnnouncement
+    renderAnnouncement: renderAnnouncement,
+    renderSuccessWindow: renderSuccessWindow,
+    renderErrorWindow: renderErrorWindow
   };
 })();
