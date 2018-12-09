@@ -10,7 +10,6 @@
     },
     getElementCoords: function (element) {
       var box = element.getBoundingClientRect();
-
       return {
         top: Math.round(box.top + pageYOffset),
         left: Math.round(box.left + pageXOffset)
