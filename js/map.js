@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var MAP_PIN_ARROW_HEIGHT = 15;
+
   var mapPinMain = window.data.mapBlock.querySelector('.map__pin--main');
   var notice = window.data.notice;
   var noticeForm = notice.querySelector('.ad-form');
@@ -31,7 +33,7 @@
   }
 
   function setAddress(coords) {
-    addressInput.value = (coords.left + Math.ceil(mapPinMain.offsetWidth / 2)) + ',' + (coords.top + mapPinMain.offsetHeight);
+    addressInput.value = (coords.left + Math.ceil(mapPinMain.offsetWidth / 2)) + ',' + (coords.top + mapPinMain.offsetHeight + MAP_PIN_ARROW_HEIGHT);
   }
 
   function closeAnnouncement(annocement, oldPin) {
@@ -60,27 +62,32 @@
   }
 
   function onMapPinClick(currentPin, currentAnnouncement) {
-    currentPin.addEventListener('click', function () {
-      var oldAnnocement = window.data.mapBlock.querySelector('.map__card');
-      var oldPin = window.data.mapBlock.querySelector('.map__pin--active');
+    var oldAnnocement = window.data.mapBlock.querySelector('.map__card');
+    var oldPin = window.data.mapBlock.querySelector('.map__pin--active');
 
-      if (oldAnnocement) {
-        closeAnnouncement(oldAnnocement, oldPin);
-      }
+    if (oldAnnocement) {
+      closeAnnouncement(oldAnnocement, oldPin);
+    }
 
-      window.render.renderAnnouncement(currentAnnouncement);
+    window.render.renderAnnouncement(currentAnnouncement);
 
-      var newAnnocement = window.data.mapBlock.querySelector('.map__card');
-      setCloseButtonActionOnClick(newAnnocement);
-      document.addEventListener('keydown', onAnnouncementEscPress);
-      currentPin.classList.add('map__pin--active');
-    });
+    var newAnnocement = window.data.mapBlock.querySelector('.map__card');
+    setCloseButtonActionOnClick(newAnnocement);
+    document.addEventListener('keydown', onAnnouncementEscPress);
+    currentPin.classList.add('map__pin--active');
   }
 
-  function setMapPinsActionOnClick(pins, annocements) {
-    for (var i = 0; i < annocements.length; i++) {
-      onMapPinClick(pins[i], annocements[i]);
-    }
+  function setMapPinsActionOnClick(annocements) {
+    window.data.map.addEventListener('click', function (evt) {
+      var targetPin = evt.target.closest('.map__pin:not(.map__pin--main)');
+
+      if (targetPin.tagName !== 'BUTTON') {
+        return;
+      }
+
+      var indexOfTargetPin = Array.prototype.indexOf.call(window.mapPins, targetPin);
+      onMapPinClick(targetPin, annocements[indexOfTargetPin]);
+    });
   }
 
   function relocatePins(pins) {
@@ -94,7 +101,7 @@
     var loadedAnnoucementsCards = announcementCards;
     window.render.renderMapPins(loadedAnnoucementsCards);
     var mapPins = window.data.mapBlock.querySelectorAll('.map__pin:not(.map__pin--main)');
-    setMapPinsActionOnClick(mapPins, loadedAnnoucementsCards);
+    setMapPinsActionOnClick(loadedAnnoucementsCards);
     relocatePins(mapPins);
 
     window.mapPins = mapPins;
@@ -174,11 +181,11 @@
       if (newLeft > window.data.mapBlock.offsetWidth - Math.ceil(pin.offsetWidth / 2)) {
         newLeft = window.data.mapBlock.offsetWidth - Math.ceil(pin.offsetWidth / 2);
       }
-      if (newTop < window.data.MAP_Y_MIN - pin.offsetHeight) {
-        newTop = window.data.MAP_Y_MIN - pin.offsetHeight;
+      if (newTop < window.data.MAP_Y_MIN - (pin.offsetHeight + MAP_PIN_ARROW_HEIGHT)) {
+        newTop = window.data.MAP_Y_MIN - (pin.offsetHeight + MAP_PIN_ARROW_HEIGHT);
       }
-      if (newTop > window.data.MAP_Y_MAX - pin.offsetHeight) {
-        newTop = window.data.MAP_Y_MAX - pin.offsetHeight;
+      if (newTop > window.data.MAP_Y_MAX - (pin.offsetHeight + MAP_PIN_ARROW_HEIGHT)) {
+        newTop = window.data.MAP_Y_MAX - (pin.offsetHeight + MAP_PIN_ARROW_HEIGHT);
       }
 
       setPosition(element, newLeft, newTop);
@@ -218,6 +225,7 @@
     window.data.mapBlock.removeChild(errorWindow);
     document.removeEventListener('keydown', onErrorWindowEscPress);
     document.removeEventListener('click', onErrorWindowClick);
+    window.errorCloseButton.removeEventListener('click', onErrorCloseButtonClick);
   }
 
   var onErrorWindowEscPress = function (evt) {
@@ -235,10 +243,10 @@
 
   function onErrorAnnouncementSave() {
     window.render.renderErrorWindow();
-    var errorCloseButton = window.data.mapBlock.querySelector('.error__button');
+    window.errorCloseButton = window.data.mapBlock.querySelector('.error__button');
     document.addEventListener('keydown', onErrorWindowEscPress);
     document.addEventListener('click', onErrorWindowClick);
-    errorCloseButton.addEventListener('click', onErrorCloseButtonClick);
+    window.errorCloseButton.addEventListener('click', onErrorCloseButtonClick);
   }
 
   disableFormInputs();
