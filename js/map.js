@@ -35,94 +35,98 @@
   function setAddress(coords) {
     addressInput.value = (coords.left + Math.ceil(mapPinMain.offsetWidth / 2)) + ',' + (coords.top + mapPinMain.offsetHeight + MAP_PIN_ARROW_HEIGHT);
   }
+  // function dfd(){
+  //   // function closeAnnouncement(annocement, oldPin) {
+  // //   var element = annocement ? annocement : window.data.mapBlock.querySelector('.map__card');
+  // //   var pin = oldPin ? oldPin : window.data.mapBlock.querySelector('.map__pin--active');
 
-  function closeAnnouncement(annocement, oldPin) {
-    var element = annocement ? annocement : window.data.mapBlock.querySelector('.map__card');
-    var pin = oldPin ? oldPin : window.data.mapBlock.querySelector('.map__pin--active');
+  // //   if (element) {
+  // //     window.data.mapBlock.removeChild(element);
+  // //     document.removeEventListener('keydown', onAnnouncementEscPress);
+  // //     pin.classList.remove('map__pin--active');
+  // //   }
+  // // }
 
-    if (element) {
-      window.data.mapBlock.removeChild(element);
-      document.removeEventListener('keydown', onAnnouncementEscPress);
-      pin.classList.remove('map__pin--active');
-    }
-  }
+  // // var onAnnouncementEscPress = function (evt) {
+  // //   evt.preventDefault();
+  // //   window.utils.isEscEvent(evt, closeAnnouncement);
+  // // };
 
-  var onAnnouncementEscPress = function (evt) {
-    evt.preventDefault();
-    window.utils.isEscEvent(evt, closeAnnouncement);
-  };
+  // // function onCloseButtonClick() {
+  // //   closeAnnouncement();
+  // // }
 
-  function onCloseButtonClick() {
-    closeAnnouncement();
-  }
+  // // function setCloseButtonActionOnClick(element) {
+  // //   var closeAnnouncementButton = element.querySelector('.popup__close');
+  // //   closeAnnouncementButton.addEventListener('click', onCloseButtonClick);
+  // // }
 
-  function setCloseButtonActionOnClick(element) {
-    var closeAnnouncementButton = element.querySelector('.popup__close');
-    closeAnnouncementButton.addEventListener('click', onCloseButtonClick);
-  }
+  // // function onMapPinClick(currentPin, currentAnnouncement) {
+  // //   var oldAnnocement = window.data.mapBlock.querySelector('.map__card');
+  // //   var oldPin = window.data.mapBlock.querySelector('.map__pin--active');
 
-  function onMapPinClick(currentPin, currentAnnouncement) {
-    var oldAnnocement = window.data.mapBlock.querySelector('.map__card');
-    var oldPin = window.data.mapBlock.querySelector('.map__pin--active');
+  // //   if (oldAnnocement) {
+  // //     closeAnnouncement(oldAnnocement, oldPin);
+  // //   }
 
-    if (oldAnnocement) {
-      closeAnnouncement(oldAnnocement, oldPin);
-    }
+  // //   window.render.renderAnnouncement(currentAnnouncement);
 
-    window.render.renderAnnouncement(currentAnnouncement);
+  // //   var newAnnocement = window.data.mapBlock.querySelector('.map__card');
+  // //   setCloseButtonActionOnClick(newAnnocement);
+  // //   document.addEventListener('keydown', onAnnouncementEscPress);
+  // //   currentPin.classList.add('map__pin--active');
+  // // }
 
-    var newAnnocement = window.data.mapBlock.querySelector('.map__card');
-    setCloseButtonActionOnClick(newAnnocement);
-    document.addEventListener('keydown', onAnnouncementEscPress);
-    currentPin.classList.add('map__pin--active');
-  }
+  // // function setMapPinsActionOnClick(annocements) {
+  // //   window.data.map.addEventListener('click', function (evt) {
+  // //     var targetPin = evt.target.closest('.map__pin:not(.map__pin--main)');
 
-  function setMapPinsActionOnClick(annocements) {
-    window.data.map.addEventListener('click', function (evt) {
-      var targetPin = evt.target.closest('.map__pin:not(.map__pin--main)');
+  // //     if (!targetPin) {
+  // //       return;
+  // //     }
 
-      if (targetPin.tagName !== 'BUTTON') {
-        return;
-      }
+  // //     var indexOfTargetPin = Array.prototype.indexOf.call(window.map.mapPins, targetPin);
+  // //     onMapPinClick(targetPin, annocements[indexOfTargetPin]);
+  // //   });
+  // // }
 
-      var indexOfTargetPin = Array.prototype.indexOf.call(window.mapPins, targetPin);
-      onMapPinClick(targetPin, annocements[indexOfTargetPin]);
-    });
-  }
+  // // function relocatePins(pins) {
+  // //   for (var i = 0; i < pins.length; i++) {
+  // //     pins[i].style.left = parseInt(pins[i].style.left, 10) - pins[i].offsetWidth / 2 + 'px';
+  // //     pins[i].style.top = parseInt(pins[i].style.top, 10) - pins[i].offsetHeight + 'px';
+  // //   }
+  // // }
 
-  function relocatePins(pins) {
-    for (var i = 0; i < pins.length; i++) {
-      pins[i].style.left = parseInt(pins[i].style.left, 10) - pins[i].offsetWidth / 2 + 'px';
-      pins[i].style.top = parseInt(pins[i].style.top, 10) - pins[i].offsetHeight + 'px';
-    }
-  }
+  // // function onSuccesAnnouncementsLoad(announcementCards) {
+  // //   var loadedAnnoucementsCards = announcementCards;
+  // //   window.render.renderMapPins(loadedAnnoucementsCards);
+  // //   var mapPins = window.data.mapBlock.querySelectorAll('.map__pin:not(.map__pin--main)');
+  // //   setMapPinsActionOnClick(loadedAnnoucementsCards);
+  // //   relocatePins(mapPins);
 
-  function onSuccesAnnouncementsLoad(announcementCards) {
-    var loadedAnnoucementsCards = announcementCards;
-    window.render.renderMapPins(loadedAnnoucementsCards);
-    var mapPins = window.data.mapBlock.querySelectorAll('.map__pin:not(.map__pin--main)');
-    setMapPinsActionOnClick(loadedAnnoucementsCards);
-    relocatePins(mapPins);
+  // //   window.map = {
+  // //     loadedAnnoucementsCards: loadedAnnoucementsCards,
+  // //     mapPins: mapPins
+  // //   };
+  // // }
 
-    window.mapPins = mapPins;
-  }
-
-  function onErrorAnnouncementsLoad(message) {
-    var errorBlock = document.createElement('div');
-    errorBlock.id = 'error-block';
-    errorBlock.style = 'z-index: 5; font-size: 15px; background-color: red; color: white; padding: 5px;';
-    errorBlock.textContent = message;
-    errorBlock.style.position = 'fixed';
-    errorBlock.style.left = 0;
-    errorBlock.style.top = 0;
-    document.body.insertAdjacentElement('afterbegin', errorBlock);
-  }
+  // // function onErrorAnnouncementsLoad(message) {
+  // //   var errorBlock = document.createElement('div');
+  // //   errorBlock.id = 'error-block';
+  // //   errorBlock.style = 'z-index: 5; font-size: 15px; background-color: red; color: white; padding: 5px;';
+  // //   errorBlock.textContent = message;
+  // //   errorBlock.style.position = 'fixed';
+  // //   errorBlock.style.left = 0;
+  // //   errorBlock.style.top = 0;
+  // //   document.body.insertAdjacentElement('afterbegin', errorBlock);
+  // // }
+  // }
 
   function activateMapAndForm() {
     window.data.mapBlock.classList.remove('map--faded');
     noticeForm.classList.remove('ad-form--disabled');
-
-    window.backend.load('https://js.dump.academy/keksobooking/data', onSuccesAnnouncementsLoad, onErrorAnnouncementsLoad);
+    window.pins.getAnnouncements();
+    // window.backend.load('https://js.dump.academy/keksobooking/data', onSuccesAnnouncementsLoad, onErrorAnnouncementsLoad);
     enableFormInputs();
   }
 
@@ -133,10 +137,10 @@
     setPosition(mapPinMain, startMapPinMainCoords.left, startMapPinMainCoords.top);
     setAddress(startMapPinMainCoords);
     window.form.setDefaultInputsValue();
-    closeAnnouncement();
+    window.pins.closeAnnouncement();
 
-    for (var i = 0; i < window.mapPins.length; i++) {
-      window.data.map.removeChild(window.mapPins[i]);
+    for (var i = 0; i < window.pins.mapPins.length; i++) {
+      window.data.map.removeChild(window.pins.mapPins[i]);
     }
 
     isMapActivated = false;
@@ -225,7 +229,7 @@
     window.data.mapBlock.removeChild(errorWindow);
     document.removeEventListener('keydown', onErrorWindowEscPress);
     document.removeEventListener('click', onErrorWindowClick);
-    window.errorCloseButton.removeEventListener('click', onErrorCloseButtonClick);
+    window.map.errorCloseButton.removeEventListener('click', onErrorCloseButtonClick);
   }
 
   var onErrorWindowEscPress = function (evt) {
@@ -243,10 +247,14 @@
 
   function onErrorAnnouncementSave() {
     window.render.renderErrorWindow();
-    window.errorCloseButton = window.data.mapBlock.querySelector('.error__button');
+    var errorCloseButton = window.data.mapBlock.querySelector('.error__button');
     document.addEventListener('keydown', onErrorWindowEscPress);
     document.addEventListener('click', onErrorWindowClick);
-    window.errorCloseButton.addEventListener('click', onErrorCloseButtonClick);
+    errorCloseButton.addEventListener('click', onErrorCloseButtonClick);
+
+    window.map = {
+      errorCloseButton: errorCloseButton
+    };
   }
 
   disableFormInputs();
