@@ -73,6 +73,12 @@
     }
   }
 
+  function clearPins() {
+    for (var i = 0; i < window.pins.mapPins.length; i++) {
+      window.data.map.removeChild(window.pins.mapPins[i]);
+    }
+  }
+
   function onSuccesAnnouncementsLoad(announcementCards) {
     var loadedAnnoucementsCards = announcementCards;
     window.filter.getCopyOfAnnoucementsForFilter(loadedAnnoucementsCards);
@@ -92,6 +98,9 @@
 
   window.pins = {
     closeAnnouncement: closeAnnouncement,
-    getAnnouncements: getAnnouncements
+    getAnnouncements: getAnnouncements,
+    setMapPinsActionOnClick: setMapPinsActionOnClick,
+    relocatePins: relocatePins,
+    clearPins: clearPins
   };
 })();

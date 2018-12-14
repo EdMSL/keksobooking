@@ -138,11 +138,7 @@
     setAddress(startMapPinMainCoords);
     window.form.setDefaultInputsValue();
     window.pins.closeAnnouncement();
-
-    for (var i = 0; i < window.pins.mapPins.length; i++) {
-      window.data.map.removeChild(window.pins.mapPins[i]);
-    }
-
+    window.pins.clearPins();
     isMapActivated = false;
   }
 
