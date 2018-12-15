@@ -6,7 +6,6 @@
   var mapPinMain = window.data.mapBlock.querySelector('.map__pin--main');
   var notice = window.data.notice;
   var noticeForm = notice.querySelector('.ad-form');
-  var noticeFieldsets = notice.querySelectorAll('.ad-form__element');
   var addressInput = notice.querySelector('#address');
   var resetMapButton = window.data.notice.querySelector('.ad-form__reset');
   var isMapActivated = false;
@@ -20,125 +19,28 @@
     };
   }
 
-  function disableFormInputs() {
-    for (var i = 0; i < noticeFieldsets.length; i++) {
-      noticeFieldsets[i].setAttribute('disabled', true);
-    }
-  }
-
-  function enableFormInputs() {
-    for (var i = 0; i < noticeFieldsets.length; i++) {
-      noticeFieldsets[i].removeAttribute('disabled');
-    }
-  }
-
   function setAddress(coords) {
     addressInput.value = (coords.left + Math.ceil(mapPinMain.offsetWidth / 2)) + ',' + (coords.top + mapPinMain.offsetHeight + MAP_PIN_ARROW_HEIGHT);
   }
-  // function dfd(){
-  //   // function closeAnnouncement(annocement, oldPin) {
-  // //   var element = annocement ? annocement : window.data.mapBlock.querySelector('.map__card');
-  // //   var pin = oldPin ? oldPin : window.data.mapBlock.querySelector('.map__pin--active');
-
-  // //   if (element) {
-  // //     window.data.mapBlock.removeChild(element);
-  // //     document.removeEventListener('keydown', onAnnouncementEscPress);
-  // //     pin.classList.remove('map__pin--active');
-  // //   }
-  // // }
-
-  // // var onAnnouncementEscPress = function (evt) {
-  // //   evt.preventDefault();
-  // //   window.utils.isEscEvent(evt, closeAnnouncement);
-  // // };
-
-  // // function onCloseButtonClick() {
-  // //   closeAnnouncement();
-  // // }
-
-  // // function setCloseButtonActionOnClick(element) {
-  // //   var closeAnnouncementButton = element.querySelector('.popup__close');
-  // //   closeAnnouncementButton.addEventListener('click', onCloseButtonClick);
-  // // }
-
-  // // function onMapPinClick(currentPin, currentAnnouncement) {
-  // //   var oldAnnocement = window.data.mapBlock.querySelector('.map__card');
-  // //   var oldPin = window.data.mapBlock.querySelector('.map__pin--active');
-
-  // //   if (oldAnnocement) {
-  // //     closeAnnouncement(oldAnnocement, oldPin);
-  // //   }
-
-  // //   window.render.renderAnnouncement(currentAnnouncement);
-
-  // //   var newAnnocement = window.data.mapBlock.querySelector('.map__card');
-  // //   setCloseButtonActionOnClick(newAnnocement);
-  // //   document.addEventListener('keydown', onAnnouncementEscPress);
-  // //   currentPin.classList.add('map__pin--active');
-  // // }
-
-  // // function setMapPinsActionOnClick(annocements) {
-  // //   window.data.map.addEventListener('click', function (evt) {
-  // //     var targetPin = evt.target.closest('.map__pin:not(.map__pin--main)');
-
-  // //     if (!targetPin) {
-  // //       return;
-  // //     }
-
-  // //     var indexOfTargetPin = Array.prototype.indexOf.call(window.map.mapPins, targetPin);
-  // //     onMapPinClick(targetPin, annocements[indexOfTargetPin]);
-  // //   });
-  // // }
-
-  // // function relocatePins(pins) {
-  // //   for (var i = 0; i < pins.length; i++) {
-  // //     pins[i].style.left = parseInt(pins[i].style.left, 10) - pins[i].offsetWidth / 2 + 'px';
-  // //     pins[i].style.top = parseInt(pins[i].style.top, 10) - pins[i].offsetHeight + 'px';
-  // //   }
-  // // }
-
-  // // function onSuccesAnnouncementsLoad(announcementCards) {
-  // //   var loadedAnnoucementsCards = announcementCards;
-  // //   window.render.renderMapPins(loadedAnnoucementsCards);
-  // //   var mapPins = window.data.mapBlock.querySelectorAll('.map__pin:not(.map__pin--main)');
-  // //   setMapPinsActionOnClick(loadedAnnoucementsCards);
-  // //   relocatePins(mapPins);
-
-  // //   window.map = {
-  // //     loadedAnnoucementsCards: loadedAnnoucementsCards,
-  // //     mapPins: mapPins
-  // //   };
-  // // }
-
-  // // function onErrorAnnouncementsLoad(message) {
-  // //   var errorBlock = document.createElement('div');
-  // //   errorBlock.id = 'error-block';
-  // //   errorBlock.style = 'z-index: 5; font-size: 15px; background-color: red; color: white; padding: 5px;';
-  // //   errorBlock.textContent = message;
-  // //   errorBlock.style.position = 'fixed';
-  // //   errorBlock.style.left = 0;
-  // //   errorBlock.style.top = 0;
-  // //   document.body.insertAdjacentElement('afterbegin', errorBlock);
-  // // }
-  // }
 
   function activateMapAndForm() {
     window.data.mapBlock.classList.remove('map--faded');
     noticeForm.classList.remove('ad-form--disabled');
     window.pins.getAnnouncements();
-    // window.backend.load('https://js.dump.academy/keksobooking/data', onSuccesAnnouncementsLoad, onErrorAnnouncementsLoad);
-    enableFormInputs();
+    window.form.enableFormInputs();
+    window.filter.disableFilters();
   }
 
   function deactivateMapAndForm() {
     window.data.mapBlock.classList.add('map--faded');
     noticeForm.classList.add('ad-form--disabled');
-    disableFormInputs();
+    window.form.disableFormInputs();
     setPosition(mapPinMain, startMapPinMainCoords.left, startMapPinMainCoords.top);
     setAddress(startMapPinMainCoords);
     window.form.setDefaultInputsValue();
     window.pins.closeAnnouncement();
     window.pins.clearPins();
+    window.filter.resetFilters();
     isMapActivated = false;
   }
 
@@ -253,7 +155,7 @@
     };
   }
 
-  disableFormInputs();
+  window.form.disableFormInputs();
   setAddress(startMapPinMainCoords);
   window.form.setMaxAvailableGuests();
 

@@ -2,22 +2,13 @@
 
 (function () {
   var filtersBlock = window.data.mapBlock.querySelector('.map__filters');
-  var housingTypeSelect = filtersBlock.querySelector('#housing-type');
-  var housingPriceSelect = filtersBlock.querySelector('#housing-price');
-  var housingRoomsSelect = filtersBlock.querySelector('#housing-rooms');
-  var housingGuestsSelect = filtersBlock.querySelector('#housing-guests');
+  var housingSelects = filtersBlock.querySelectorAll('select');
   var housingFeaturesInputs = filtersBlock.querySelectorAll('#housing-features input');
-
-  var selectedHousingType;
-  var selectedHousingPrice;
-  var selectedHousingRooms;
-  var selectedHousingGuests;
 
   var middleMinPrice = 10000;
   var middleMaxPrice = 50000;
 
   var copyAnnoucements;
-  var changedCopyAnnoucements;
 
   function getCopyOfAnnoucementsForFilter(annoucements) {
     copyAnnoucements = annoucements.slice();
@@ -37,116 +28,81 @@
     return priceStr;
   }
 
-  // function getRank(option) {
-  //   var rank = 0;
+  function getOfferValue(element) {
+    var idArr = element.split('-');
+    return idArr[idArr.length - 1];
+  }
 
-  //   if (option.offer.type === selectedHousingType) {
-  //     rank += 1;
-  //   }
-  //   if (getPrice(option.offer.price) === selectedHousingPrice) {
-  //     rank += 1;
-  //   }
-  //   if (option.offer.rooms === selectedHousingRooms) {
-  //     rank += 1;
-  //   }
-  //   if (option.offer.guests === selectedHousingGuests) {
-  //     rank += 1;
-  //   }
-  //   return rank;
-  // }
-
-  // function getCurrentSelectValue(element) {
-  //   var selectedValue;
-  //   if (element.id === 'housing-type') {
-  //     selectedValue = selectedHousingType = element.options[element.selectedIndex].value;
-  //   }
-  //   if (element.id === 'housing-price') {
-  //     selectedValue = selectedHousingPrice = element.options[element.selectedIndex].value;
-  //   }
-  //   if (element.id === 'housing-rooms') {
-  //     selectedValue = selectedHousingRooms = element.options[element.selectedIndex].value;
-  //   }
-  //   if (element.id === 'housing-guests') {
-  //     selectedValue = selectedHousingGuests = element.options[element.selectedIndex].value;
-  //   }
-  //   return selectedValue;
-  // }
-
-  // function getSelectValueForOffer(element) {
-  //   var idArr = element.id.split('-');
-  //   return idArr[idArr.length - 1];
-  // }
-
-  // function filterElements(element) {
-  //   return element.offer[housing] + '' === set;
-  // }
-
-  // function onSelectChange(evt) {
-  //   var select = evt.target;
-  //   var set = getCurrentSelectValue(select);
-  //   var housing = getSelectValueForOffer(select);
-  //   changedCopyAnnoucements = copyAnnoucements.slice().
-  //   filter(function (element) {
-  //     return element.offer[housing] + '' === set;
-  //   }).
-  //   sort(function (left, right) {
-  //     var rankDiff = getRank(right) - getRank(left);
-  //     // if (rankDiff === 0) {
-  //     //   rankDiff = wizards.indexOf(left) - wizards.indexOf(right);
-  //     // }
-  //     return rankDiff;
-  //   });
-
-  //   updatePins(changedCopyAnnoucements);
-  // }
-
-  // function filter(element, value) {
-  //   return offerElement === selectedValue;
-  // }
-
-  function showNeed(select, elementOffer) {
-    var selectedValue = select.options[select.selectedIndex].value;
-    changedCopyAnnoucements = copyAnnoucements.slice().
-    filter(function (element) {
-      if (selectedValue === 'any') {
-        return copyAnnoucements;
-      }
-      if (elementOffer === 'price') {
-        return getPrice(element.offer[elementOffer]) + '' === selectedValue;
-      } else {
-        return element.offer[elementOffer] + '' === selectedValue;
-      }
+  function getSelectsSelectedValues() {
+    var newArr = Array.prototype.map.call(housingSelects, function (element) {
+      return element.options[element.selectedIndex].value;
     });
-    updatePins(changedCopyAnnoucements);
-    console.log(changedCopyAnnoucements)
-    // .sort(function (left, right) {
-    //   var rankDiff = getRank(right) - getRank(left);
-    //   return rankDiff;
-    // });
+    return newArr;
   }
 
-  function onHousingTypeSelectChange(evt) {
-    showNeed(evt.target, 'type');
+  function getSuitableAnnoucementsAfterSelects(annoucements) {
+    var currentAnnoucements = annoucements;
+    var selectsSelectedValues = getSelectsSelectedValues();
 
-    // updatePins(changedCopyAnnoucements);
+    for (var i = 0; i < selectsSelectedValues.length; i++) {
+      var currentSelectValue = selectsSelectedValues[i];
+      var currentOfferValue = getOfferValue(housingSelects[i].id);
+
+      if (currentSelectValue === 'any') {
+        continue;
+      }
+
+      currentAnnoucements = currentAnnoucements.filter(function (element) {
+        if (currentOfferValue === 'price') {
+          return getPrice(element.offer[currentOfferValue]) + '' === currentSelectValue;
+        } else {
+          return element.offer[currentOfferValue] + '' === currentSelectValue;
+        }
+      });
+    }
+    return currentAnnoucements;
   }
 
-  function onHousingPriceSelectChange(evt) {
-    showNeed(evt.target, 'price');
-
-    // updatePins(changedCopyAnnoucements);
+  function getSelectedCheckboxesValues() {
+    var newArr = [];
+    for (var i = 0; i < housingFeaturesInputs.length; i++) {
+      var currentFeaturesInputValue = getOfferValue(housingFeaturesInputs[i].id);
+      if (housingFeaturesInputs[i].checked) {
+        newArr.push(currentFeaturesInputValue);
+      }
+    }
+    return newArr;
   }
 
-  function onHousingRoomsSelectChange(evt) {
-    showNeed(evt.target, 'rooms');
+  function getSuitableAnnoucementsAfterCheckboxes(annoucements) {
+    var currentAnnoucements = annoucements;
+    var selectedFeatures = getSelectedCheckboxesValues();
 
-    // updatePins(changedCopyAnnoucements);
+    for (var i = 0; i < selectedFeatures.length; i++) {
+      var currentSelectedFeature = selectedFeatures[i];
+
+      currentAnnoucements = currentAnnoucements.filter(function (element) {
+        for (var j = 0; j < element.offer.features.length; j++) {
+          var currentAnnousementFeature = element.offer.features[j];
+          var isAnnoucementHaveFeature;
+
+          if (currentAnnousementFeature === currentSelectedFeature) {
+            isAnnoucementHaveFeature = true;
+          }
+        }
+        return isAnnoucementHaveFeature;
+      });
+    }
+    return currentAnnoucements;
   }
 
-  function onHousingGuestsSelectChange(evt) {
-    showNeed(evt.target, 'guests');
+  function selectSuitableAnnoucements() {
+    var suitableAnnoucements = copyAnnoucements.slice();
 
-    // updatePins(changedCopyAnnoucements);
+    suitableAnnoucements = getSuitableAnnoucementsAfterSelects(suitableAnnoucements);
+    suitableAnnoucements = getSuitableAnnoucementsAfterCheckboxes(suitableAnnoucements);
+
+    updatePins(suitableAnnoucements);
   }
 
   function updatePins(annoucements) {
@@ -158,12 +114,67 @@
     window.pins.relocatePins(window.pins.mapPins);
   }
 
-  housingTypeSelect.addEventListener('change', onHousingTypeSelectChange);
-  housingPriceSelect.addEventListener('change', onHousingPriceSelectChange);
-  housingRoomsSelect.addEventListener('change', onHousingRoomsSelectChange);
-  housingGuestsSelect.addEventListener('change', onHousingGuestsSelectChange);
+  function resetSelects() {
+    housingSelects.forEach(function (element) {
+      element.selectedIndex = 0;
+    });
+  }
+
+  function disableSelects() {
+    housingSelects.forEach(function (element) {
+      element.setAttribute('disabled', true);
+    });
+  }
+
+  function enableSelects() {
+    housingSelects.forEach(function (element) {
+      element.removeAttribute('disabled');
+    });
+  }
+
+  function resetCheckboxes() {
+    housingFeaturesInputs.forEach(function (element) {
+      element.checked = false;
+    });
+  }
+
+  function disableCheckboxes() {
+    housingFeaturesInputs.forEach(function (element) {
+      element.setAttribute('disabled', true);
+    });
+  }
+
+  function enableCheckboxes() {
+    housingFeaturesInputs.forEach(function (element) {
+      element.removeAttribute('disabled');
+    });
+  }
+
+  function resetFilters() {
+    resetSelects();
+    resetCheckboxes();
+  }
+
+  function disableFilters() {
+    disableSelects();
+    disableCheckboxes();
+  }
+
+  function enableFilters() {
+    enableSelects();
+    enableCheckboxes();
+  }
+
+  var onSelectChange = window.debounce(function () {
+    selectSuitableAnnoucements();
+  });
+
+  filtersBlock.addEventListener('change', onSelectChange);
 
   window.filter = {
-    getCopyOfAnnoucementsForFilter: getCopyOfAnnoucementsForFilter
+    disableFilters: disableFilters,
+    enableFilters: enableFilters,
+    getCopyOfAnnoucementsForFilter: getCopyOfAnnoucementsForFilter,
+    resetFilters: resetFilters
   };
 })();

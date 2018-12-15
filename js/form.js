@@ -5,6 +5,7 @@
   var NO_GUESTS = 0;
 
   var notice = window.data.notice;
+  var noticeFieldsets = notice.querySelectorAll('.ad-form__element');
   var titleInput = notice.querySelector('#title');
   var typeInput = notice.querySelector('#type');
   var priceInput = notice.querySelector('#price');
@@ -22,6 +23,18 @@
   var featuresInputs = notice.querySelectorAll('.features input[type="checkbox"]');
   var selects = notice.querySelectorAll('select');
   var selectsDefaultValues = getDefaultSelectsOptions(selects);
+
+  function disableFormInputs() {
+    for (var i = 0; i < noticeFieldsets.length; i++) {
+      noticeFieldsets[i].setAttribute('disabled', true);
+    }
+  }
+
+  function enableFormInputs() {
+    for (var i = 0; i < noticeFieldsets.length; i++) {
+      noticeFieldsets[i].removeAttribute('disabled');
+    }
+  }
 
   function getSelectedOptionOnSelect(select) {
     for (var i = 0; i < select.options.length; i++) {
@@ -130,8 +143,10 @@
   }
 
   window.form = {
+    disableFormInputs: disableFormInputs,
+    enableFormInputs: enableFormInputs,
     setAnnoucementFormListeners: setAnnoucementFormListeners,
     setMaxAvailableGuests: setMaxAvailableGuests,
-    setDefaultInputsValue: setDefaultInputsValue
+    setDefaultInputsValue: setDefaultInputsValue,
   };
 })();

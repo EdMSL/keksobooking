@@ -86,6 +86,7 @@
     var mapPins = window.data.mapBlock.querySelectorAll('.map__pin:not(.map__pin--main)');
     setMapPinsActionOnClick(loadedAnnoucementsCards);
     relocatePins(mapPins);
+    window.filter.enableFilters();
 
     window.pins.loadedAnnoucementsCards = loadedAnnoucementsCards;
     window.pins.mapPins = mapPins;
