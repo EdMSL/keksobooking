@@ -110,7 +110,6 @@
     window.pins.clearPins();
     window.render.renderMapPins(annoucements);
     window.pins.mapPins = window.data.mapBlock.querySelectorAll('.map__pin:not(.map__pin--main)');
-    window.pins.setMapPinsActionOnClick(annoucements);
     window.pins.relocatePins(window.pins.mapPins);
   }
 
