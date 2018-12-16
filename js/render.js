@@ -13,9 +13,12 @@
 
   function renderMapPins(cards) {
     var pinTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
+    var maxRenderedPins = 5;
     var fragment = document.createDocumentFragment();
 
-    for (var i = 0; i < cards.length; i++) {
+    var quontityRenderedPins = cards.length > maxRenderedPins ? maxRenderedPins : cards.length;
+
+    for (var i = 0; i < quontityRenderedPins; i++) {
       var pinElement = pinTemplate.cloneNode(true);
       var pinImg = pinElement.querySelector('img');
 
