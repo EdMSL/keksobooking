@@ -90,7 +90,7 @@
         onError('Превышено время ожидания. Пожалуйста, попробуйте позднее');
       });
 
-      xhr.timeout = 10000;
+      xhr.timeout = REQUEST_TIMEOUT;
 
       xhr.open('POST', url);
       xhr.send(data);

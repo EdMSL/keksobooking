@@ -6,6 +6,7 @@
 
   var notice = window.data.notice;
   var noticeFieldsets = notice.querySelectorAll('.ad-form__element');
+  var noticeHeader = notice.querySelector('.ad-form-header');
   var titleInput = notice.querySelector('#title');
   var typeInput = notice.querySelector('#type');
   var priceInput = notice.querySelector('#price');
@@ -28,12 +29,14 @@
     for (var i = 0; i < noticeFieldsets.length; i++) {
       noticeFieldsets[i].setAttribute('disabled', true);
     }
+    noticeHeader.setAttribute('disabled', true);
   }
 
   function enableFormInputs() {
     for (var i = 0; i < noticeFieldsets.length; i++) {
       noticeFieldsets[i].removeAttribute('disabled');
     }
+    noticeHeader.removeAttribute('disabled');
   }
 
   function getSelectedOptionOnSelect(select) {
@@ -131,6 +134,9 @@
     titleInput.value = '';
     priceInput.value = null;
     descriptionInput.value = '';
+    window.upload.setDefaultAvatar();
+    window.upload.resetUploadedPhotos();
+
   }
 
   function setAnnoucementFormListeners() {
@@ -141,6 +147,9 @@
     timeoutInput.addEventListener('change', onTimeInputChange);
     roomsInput.addEventListener('change', onRoomInputChange);
   }
+
+  window.upload.setAvatarUploader();
+  window.upload.setPhotosUploader();
 
   window.form = {
     disableFormInputs: disableFormInputs,
