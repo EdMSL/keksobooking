@@ -7,6 +7,6 @@
     apartmentTypeShort: ['palace', 'flat', 'house', 'bungalo'],
     mapBlock: document.querySelector('.map'),
     map: document.querySelector('.map__pins'),
-    notice: document.querySelector('.notice'),
+    notice: document.querySelector('.notice')
   };
 })();

@@ -28,7 +28,7 @@
     noticeForm.classList.remove('ad-form--disabled');
     window.pins.getAnnouncements();
     window.form.enableFormInputs();
-    window.filter.disableFilters();
+    window.form.setMinAvailablePriceToPriceInput();
   }
 
   function deactivateMapAndForm() {
@@ -41,6 +41,7 @@
     window.pins.closeAnnouncement();
     window.pins.clearPins();
     window.filter.resetFilters();
+    window.filter.disableFilters();
     isMapActivated = false;
   }
 
@@ -156,6 +157,7 @@
   }
 
   window.form.disableFormInputs();
+  window.filter.disableFilters();
   setAddress(startMapPinMainCoords);
   window.form.setMaxAvailableGuests();
 

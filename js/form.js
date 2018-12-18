@@ -148,6 +148,34 @@
     roomsInput.addEventListener('change', onRoomInputChange);
   }
 
+  titleInput.addEventListener('invalid', function () {
+    titleInput.style.border = '2px solid red';
+    if (titleInput.validity.tooShort) {
+      titleInput.setCustomValidity('Заголовок должен состоять минимум из 30-и символов');
+    } else if (titleInput.validity.tooShort) {
+      titleInput.setCustomValidity('Заголовок должен состоять максимум из 100 символов');
+    } else if (titleInput.validity.tooLong) {
+      titleInput.setCustomValidity('Это обязательное поле');
+    } else {
+      titleInput.setCustomValidity('');
+      titleInput.style.border = 'none';
+    }
+  });
+
+  priceInput.addEventListener('invalid', function () {
+    priceInput.style.border = '2px solid red';
+    if (priceInput.validity.rangeOverflow) {
+      priceInput.setCustomValidity('Цена больше максимально допустимой');
+    } else if (priceInput.validity.rangeUnderflow) {
+      priceInput.setCustomValidity('Цена меньше минимально допустимой');
+    } else if (priceInput.validity.valueMissing) {
+      priceInput.setCustomValidity('Это обязательное поле');
+    } else {
+      priceInput.setCustomValidity('');
+      priceInput.style.border = 'none';
+    }
+  });
+
   window.upload.setAvatarUploader();
   window.upload.setPhotosUploader();
 
@@ -157,5 +185,6 @@
     setAnnoucementFormListeners: setAnnoucementFormListeners,
     setMaxAvailableGuests: setMaxAvailableGuests,
     setDefaultInputsValue: setDefaultInputsValue,
+    setMinAvailablePriceToPriceInput: setMinAvailablePriceToPriceInput
   };
 })();

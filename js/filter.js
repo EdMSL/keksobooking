@@ -3,6 +3,7 @@
 (function () {
   var filtersBlock = window.data.mapBlock.querySelector('.map__filters');
   var housingSelects = filtersBlock.querySelectorAll('select');
+  var housingFeaturesContainer = filtersBlock.querySelector('.map__features');
   var housingFeaturesInputs = filtersBlock.querySelectorAll('#housing-features input');
 
   var middleMinPrice = 10000;
@@ -138,15 +139,11 @@
   }
 
   function disableCheckboxes() {
-    housingFeaturesInputs.forEach(function (element) {
-      element.setAttribute('disabled', true);
-    });
+    housingFeaturesContainer.setAttribute('disabled', true);
   }
 
   function enableCheckboxes() {
-    housingFeaturesInputs.forEach(function (element) {
-      element.removeAttribute('disabled');
-    });
+    housingFeaturesContainer.removeAttribute('disabled');
   }
 
   function resetFilters() {
