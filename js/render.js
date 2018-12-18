@@ -30,7 +30,6 @@
 
         fragment.appendChild(pinElement);
       } else {
-        // удалим элемент, если в нем нет offer
         cards.splice(i, 1);
         i--;
       }

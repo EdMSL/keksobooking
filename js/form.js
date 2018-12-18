@@ -152,9 +152,9 @@
     titleInput.style.border = '2px solid red';
     if (titleInput.validity.tooShort) {
       titleInput.setCustomValidity('Заголовок должен состоять минимум из 30-и символов');
-    } else if (titleInput.validity.tooShort) {
-      titleInput.setCustomValidity('Заголовок должен состоять максимум из 100 символов');
     } else if (titleInput.validity.tooLong) {
+      titleInput.setCustomValidity('Заголовок должен состоять максимум из 100 символов');
+    } else if (titleInput.validity.valueMissing) {
       titleInput.setCustomValidity('Это обязательное поле');
     } else {
       titleInput.setCustomValidity('');
