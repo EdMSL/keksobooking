@@ -151,9 +151,7 @@
     document.addEventListener('click', onErrorWindowClick);
     errorCloseButton.addEventListener('click', onErrorCloseButtonClick);
 
-    window.map = {
-      errorCloseButton: errorCloseButton
-    };
+    window.map.errorCloseButton = errorCloseButton;
   }
 
   window.form.disableFormInputs();

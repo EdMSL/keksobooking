@@ -5,9 +5,6 @@
   var housingSelects = filtersBlock.querySelectorAll('select');
   var housingFeaturesContainer = filtersBlock.querySelector('.map__features');
   var housingFeaturesInputs = filtersBlock.querySelectorAll('#housing-features input');
-  var newAnnocements;
-
-  var isFirstLoad = true;
 
   var middleMinPrice = 10000;
   var middleMaxPrice = 50000;
@@ -100,29 +97,11 @@
     return currentAnnoucements;
   }
 
-  var onMapPinsActionOnClick = function (evt) {
-    var targetPin = evt.target.closest('.map__pin:not(.map__pin--main)');
-
-    if (!targetPin) {
-      return;
-    }
-
-    var indexOfTargetPin = Array.prototype.indexOf.call(window.pins.mapPins, targetPin);
-    window.pins.showAnnouncementInfo(targetPin, newAnnocements[indexOfTargetPin]);
-  };
-
   function updatePins(annoucements) {
     window.pins.closeAnnouncement();
     window.pins.clearPins();
     window.render.renderMapPins(annoucements);
     window.pins.mapPins = window.data.mapBlock.querySelectorAll('.map__pin:not(.map__pin--main)');
-
-    if (isFirstLoad) {
-      window.data.map.removeEventListener('click', window.pins.onMapPinsActionOnClick);
-      window.data.map.addEventListener('click', onMapPinsActionOnClick);
-      isFirstLoad = false;
-    }
-
     window.pins.relocatePins(window.pins.mapPins);
   }
 
@@ -132,7 +111,7 @@
     suitableAnnoucements = getSuitableAnnoucementsAfterSelects(suitableAnnoucements);
     suitableAnnoucements = getSuitableAnnoucementsAfterCheckboxes(suitableAnnoucements);
 
-    newAnnocements = suitableAnnoucements;
+    window.pins.currentAnnoucementsCards = suitableAnnoucements;
 
     updatePins(suitableAnnoucements);
   }
@@ -172,8 +151,6 @@
   function resetFilters() {
     resetSelects();
     resetCheckboxes();
-    isFirstLoad = true;
-    window.data.map.removeEventListener('click', onMapPinsActionOnClick);
   }
 
   function disableFilters() {

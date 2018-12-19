@@ -53,7 +53,7 @@
     currentPin.classList.add('map__pin--active');
   }
 
-  var onMapStartPinsActionOnClick = function (evt) {
+  var onMapPinClick = function (evt) {
     var targetPin = evt.target.closest('.map__pin:not(.map__pin--main)');
 
     if (!targetPin) {
@@ -61,7 +61,7 @@
     }
 
     var indexOfTargetPin = Array.prototype.indexOf.call(window.pins.mapPins, targetPin);
-    showAnnouncementInfo(targetPin, window.pins.loadedAnnoucementsCards[indexOfTargetPin]);
+    showAnnouncementInfo(targetPin, window.pins.currentAnnoucementsCards[indexOfTargetPin]);
   };
 
   function relocatePins(pins) {
@@ -78,15 +78,15 @@
   }
 
   function onSuccesAnnouncementsLoad(announcementCards) {
-    var loadedAnnoucementsCards = announcementCards;
-    window.filter.getCopyOfAnnoucementsForFilter(loadedAnnoucementsCards);
-    window.render.renderMapPins(loadedAnnoucementsCards);
+    var currentAnnoucementsCards = announcementCards;
+    window.filter.getCopyOfAnnoucementsForFilter(currentAnnoucementsCards);
+    window.render.renderMapPins(currentAnnoucementsCards);
     var mapPins = window.data.mapBlock.querySelectorAll('.map__pin:not(.map__pin--main)');
-    window.data.map.addEventListener('click', onMapStartPinsActionOnClick);
+    window.data.map.addEventListener('click', onMapPinClick);
     relocatePins(mapPins);
     window.filter.enableFilters();
 
-    window.pins.loadedAnnoucementsCards = loadedAnnoucementsCards;
+    window.pins.currentAnnoucementsCards = currentAnnoucementsCards;
     window.pins.mapPins = mapPins;
   }
 
@@ -98,7 +98,6 @@
   window.pins = {
     closeAnnouncement: closeAnnouncement,
     getAnnouncements: getAnnouncements,
-    onMapStartPinsActionOnClick: onMapStartPinsActionOnClick,
     showAnnouncementInfo: showAnnouncementInfo,
     relocatePins: relocatePins,
     clearPins: clearPins
