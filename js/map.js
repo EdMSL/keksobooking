@@ -169,10 +169,10 @@
     evt.preventDefault();
   });
 
-  resetMapButton.addEventListener('click', function () {
+  resetMapButton.addEventListener('click', function (evt) {
+    evt.preventDefault();
     deactivateMapAndForm();
   });
 
   window.form.setAnnoucementFormListeners();
 })();
-

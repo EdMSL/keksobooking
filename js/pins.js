@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var closeAnnouncementButton;
+
   function onErrorAnnouncementsLoad(message) {
     var errorBlock = document.createElement('div');
     errorBlock.id = 'error-block';
@@ -19,6 +21,10 @@
     if (element) {
       window.data.mapBlock.removeChild(element);
       window.data.mapBlock.removeEventListener('keydown', onAnnouncementEscPress);
+
+      if (closeAnnouncementButton) {
+        closeAnnouncementButton.removeEventListener('click', onCloseButtonClick);
+      }
       pin.classList.remove('map__pin--active');
     }
   }
@@ -33,7 +39,7 @@
   }
 
   function setCloseButtonActionOnClick(element) {
-    var closeAnnouncementButton = element.querySelector('.popup__close');
+    closeAnnouncementButton = element.querySelector('.popup__close');
     closeAnnouncementButton.addEventListener('click', onCloseButtonClick);
   }
 
@@ -82,10 +88,8 @@
     window.filter.getCopyOfAnnoucementsForFilter(currentAnnoucementsCards);
     window.render.renderMapPins(currentAnnoucementsCards);
     var mapPins = window.data.mapBlock.querySelectorAll('.map__pin:not(.map__pin--main)');
-    window.data.map.addEventListener('click', onMapPinClick);
     relocatePins(mapPins);
     window.filter.enableFilters();
-
     window.pins.currentAnnoucementsCards = currentAnnoucementsCards;
     window.pins.mapPins = mapPins;
   }
@@ -94,6 +98,7 @@
     window.backend.load('https://js.dump.academy/keksobooking/data', onSuccesAnnouncementsLoad, onErrorAnnouncementsLoad);
   }
 
+  window.data.map.addEventListener('click', onMapPinClick);
 
   window.pins = {
     closeAnnouncement: closeAnnouncement,
