@@ -56,9 +56,9 @@
       currentAnnoucements = currentAnnoucements.filter(function (element) {
         if (currentOfferValue === 'price') {
           return getPrice(element.offer[currentOfferValue]) + '' === currentSelectValue;
-        } else {
-          return element.offer[currentOfferValue] + '' === currentSelectValue;
         }
+
+        return element.offer[currentOfferValue] + '' === currentSelectValue;
       });
     }
     return currentAnnoucements;
@@ -124,13 +124,13 @@
 
   function disableSelects() {
     housingSelects.forEach(function (element) {
-      element.setAttribute('disabled', true);
+      element.disabled = 'true';
     });
   }
 
   function enableSelects() {
     housingSelects.forEach(function (element) {
-      element.removeAttribute('disabled');
+      element.disabled = '';
     });
   }
 
@@ -141,11 +141,11 @@
   }
 
   function disableCheckboxes() {
-    housingFeaturesContainer.setAttribute('disabled', true);
+    housingFeaturesContainer.disabled = 'true';
   }
 
   function enableCheckboxes() {
-    housingFeaturesContainer.removeAttribute('disabled');
+    housingFeaturesContainer.disabled = '';
   }
 
   function resetFilters() {

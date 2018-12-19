@@ -24,9 +24,9 @@
     },
     changeElementAttribute: function (element, attribute, value, index) {
       if (Array.isArray(value)) {
-        element.setAttribute(attribute, value[index]);
+        element[attribute] = value[index];
       } else {
-        element.setAttribute(attribute, value);
+        element[attribute] = value;
       }
     },
     removeListElements: function (list) {
@@ -35,9 +35,8 @@
     generateClassModificator: function (className, modificator, index) {
       if (Array.isArray(modificator)) {
         return className + '--' + modificator[index];
-      } else {
-        return className + '--' + modificator;
       }
+      return className + '--' + modificator;
     }
   };
 })();

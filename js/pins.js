@@ -29,10 +29,10 @@
     }
   }
 
-  var onAnnouncementEscPress = function (evt) {
+  function onAnnouncementEscPress(evt) {
     evt.preventDefault();
     window.utils.isEscEvent(evt, closeAnnouncement);
-  };
+  }
 
   function onCloseButtonClick() {
     closeAnnouncement();
@@ -59,7 +59,7 @@
     currentPin.classList.add('map__pin--active');
   }
 
-  var onMapPinClick = function (evt) {
+  function onMapPinClick(evt) {
     var targetPin = evt.target.closest('.map__pin:not(.map__pin--main)');
 
     if (!targetPin) {
@@ -68,7 +68,7 @@
 
     var indexOfTargetPin = Array.prototype.indexOf.call(window.pins.mapPins, targetPin);
     showAnnouncementInfo(targetPin, window.pins.currentAnnoucementsCards[indexOfTargetPin]);
-  };
+  }
 
   function relocatePins(pins) {
     for (var i = 0; i < pins.length; i++) {
