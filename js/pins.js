@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var closeAnnouncementButton;
+
   function onErrorAnnouncementsLoad(message) {
     var errorBlock = document.createElement('div');
     errorBlock.id = 'error-block';
@@ -18,26 +20,30 @@
 
     if (element) {
       window.data.mapBlock.removeChild(element);
-      document.removeEventListener('keydown', onAnnouncementEscPress);
+      window.data.mapBlock.removeEventListener('keydown', onAnnouncementEscPress);
+
+      if (closeAnnouncementButton) {
+        closeAnnouncementButton.removeEventListener('click', onCloseButtonClick);
+      }
       pin.classList.remove('map__pin--active');
     }
   }
 
-  var onAnnouncementEscPress = function (evt) {
+  function onAnnouncementEscPress(evt) {
     evt.preventDefault();
     window.utils.isEscEvent(evt, closeAnnouncement);
-  };
+  }
 
   function onCloseButtonClick() {
     closeAnnouncement();
   }
 
   function setCloseButtonActionOnClick(element) {
-    var closeAnnouncementButton = element.querySelector('.popup__close');
+    closeAnnouncementButton = element.querySelector('.popup__close');
     closeAnnouncementButton.addEventListener('click', onCloseButtonClick);
   }
 
-  function onMapPinClick(currentPin, currentAnnouncement) {
+  function showAnnouncementInfo(currentPin, currentAnnouncement) {
     var oldAnnocement = window.data.mapBlock.querySelector('.map__card');
     var oldPin = window.data.mapBlock.querySelector('.map__pin--active');
 
@@ -49,21 +55,19 @@
 
     var newAnnocement = window.data.mapBlock.querySelector('.map__card');
     setCloseButtonActionOnClick(newAnnocement);
-    document.addEventListener('keydown', onAnnouncementEscPress);
+    window.data.mapBlock.addEventListener('keydown', onAnnouncementEscPress);
     currentPin.classList.add('map__pin--active');
   }
 
-  function setMapPinsActionOnClick(annocements) {
-    window.data.map.addEventListener('click', function (evt) {
-      var targetPin = evt.target.closest('.map__pin:not(.map__pin--main)');
+  function onMapPinClick(evt) {
+    var targetPin = evt.target.closest('.map__pin:not(.map__pin--main)');
 
-      if (!targetPin) {
-        return;
-      }
+    if (!targetPin) {
+      return;
+    }
 
-      var indexOfTargetPin = Array.prototype.indexOf.call(window.pins.mapPins, targetPin);
-      onMapPinClick(targetPin, annocements[indexOfTargetPin]);
-    });
+    var indexOfTargetPin = Array.prototype.indexOf.call(window.pins.mapPins, targetPin);
+    showAnnouncementInfo(targetPin, window.pins.currentAnnoucementsCards[indexOfTargetPin]);
   }
 
   function relocatePins(pins) {
@@ -80,15 +84,13 @@
   }
 
   function onSuccesAnnouncementsLoad(announcementCards) {
-    var loadedAnnoucementsCards = announcementCards;
-    window.filter.getCopyOfAnnoucementsForFilter(loadedAnnoucementsCards);
-    window.render.renderMapPins(loadedAnnoucementsCards);
+    var currentAnnoucementsCards = announcementCards;
+    window.filter.getCopyOfAnnoucementsForFilter(currentAnnoucementsCards);
+    window.render.renderMapPins(currentAnnoucementsCards);
     var mapPins = window.data.mapBlock.querySelectorAll('.map__pin:not(.map__pin--main)');
-    setMapPinsActionOnClick(loadedAnnoucementsCards);
     relocatePins(mapPins);
     window.filter.enableFilters();
-
-    window.pins.loadedAnnoucementsCards = loadedAnnoucementsCards;
+    window.pins.currentAnnoucementsCards = currentAnnoucementsCards;
     window.pins.mapPins = mapPins;
   }
 
@@ -96,11 +98,12 @@
     window.backend.load('https://js.dump.academy/keksobooking/data', onSuccesAnnouncementsLoad, onErrorAnnouncementsLoad);
   }
 
+  window.data.map.addEventListener('click', onMapPinClick);
 
   window.pins = {
     closeAnnouncement: closeAnnouncement,
     getAnnouncements: getAnnouncements,
-    setMapPinsActionOnClick: setMapPinsActionOnClick,
+    showAnnouncementInfo: showAnnouncementInfo,
     relocatePins: relocatePins,
     clearPins: clearPins
   };

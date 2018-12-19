@@ -3,6 +3,7 @@
 (function () {
   var filtersBlock = window.data.mapBlock.querySelector('.map__filters');
   var housingSelects = filtersBlock.querySelectorAll('select');
+  var housingFeaturesContainer = filtersBlock.querySelector('.map__features');
   var housingFeaturesInputs = filtersBlock.querySelectorAll('#housing-features input');
 
   var middleMinPrice = 10000;
@@ -55,9 +56,9 @@
       currentAnnoucements = currentAnnoucements.filter(function (element) {
         if (currentOfferValue === 'price') {
           return getPrice(element.offer[currentOfferValue]) + '' === currentSelectValue;
-        } else {
-          return element.offer[currentOfferValue] + '' === currentSelectValue;
         }
+
+        return element.offer[currentOfferValue] + '' === currentSelectValue;
       });
     }
     return currentAnnoucements;
@@ -96,21 +97,23 @@
     return currentAnnoucements;
   }
 
-  function selectSuitableAnnoucements() {
-    var suitableAnnoucements = copyAnnoucements.slice();
-
-    suitableAnnoucements = getSuitableAnnoucementsAfterSelects(suitableAnnoucements);
-    suitableAnnoucements = getSuitableAnnoucementsAfterCheckboxes(suitableAnnoucements);
-
-    updatePins(suitableAnnoucements);
-  }
-
   function updatePins(annoucements) {
     window.pins.closeAnnouncement();
     window.pins.clearPins();
     window.render.renderMapPins(annoucements);
     window.pins.mapPins = window.data.mapBlock.querySelectorAll('.map__pin:not(.map__pin--main)');
     window.pins.relocatePins(window.pins.mapPins);
+  }
+
+  function selectSuitableAnnoucements() {
+    var suitableAnnoucements = copyAnnoucements.slice();
+
+    suitableAnnoucements = getSuitableAnnoucementsAfterSelects(suitableAnnoucements);
+    suitableAnnoucements = getSuitableAnnoucementsAfterCheckboxes(suitableAnnoucements);
+
+    window.pins.currentAnnoucementsCards = suitableAnnoucements;
+
+    updatePins(suitableAnnoucements);
   }
 
   function resetSelects() {
@@ -121,13 +124,13 @@
 
   function disableSelects() {
     housingSelects.forEach(function (element) {
-      element.setAttribute('disabled', true);
+      element.disabled = 'true';
     });
   }
 
   function enableSelects() {
     housingSelects.forEach(function (element) {
-      element.removeAttribute('disabled');
+      element.disabled = '';
     });
   }
 
@@ -138,15 +141,11 @@
   }
 
   function disableCheckboxes() {
-    housingFeaturesInputs.forEach(function (element) {
-      element.setAttribute('disabled', true);
-    });
+    housingFeaturesContainer.disabled = 'true';
   }
 
   function enableCheckboxes() {
-    housingFeaturesInputs.forEach(function (element) {
-      element.removeAttribute('disabled');
-    });
+    housingFeaturesContainer.disabled = '';
   }
 
   function resetFilters() {

@@ -4,11 +4,11 @@
   var mapBlock = window.data.mapBlock;
   var map = window.data.map;
   var filtersContainer = mapBlock.querySelector('.map__filters-container');
-  var apartmentTypeShortPrint = {
-    palace: 'Дворец',
-    flat: 'Квартира',
-    house: 'Дом',
-    bungalo: 'Бунгало'
+  var ApartmentTypePrint = {
+    PALACE: 'Дворец',
+    FLAT: 'Квартира',
+    HOUSE: 'Дом',
+    BUNGALO: 'Бунгало'
   };
 
   function renderMapPins(cards) {
@@ -30,7 +30,6 @@
 
         fragment.appendChild(pinElement);
       } else {
-        // удалим элемент, если в нем нет offer
         cards.splice(i, 1);
         i--;
       }
@@ -82,7 +81,7 @@
     announcementTitle.textContent = card.offer.title;
     announcementAddress.textContent = card.offer.address;
     announcementPrice.textContent = card.offer.price + '₽/ночь';
-    announcementType.textContent = apartmentTypeShortPrint[card.offer.type];
+    announcementType.textContent = ApartmentTypePrint[card.offer.type.toUpperCase()];
     announcementCapacity.textContent = card.offer.rooms + ' комнаты для ' + card.offer.guests + ' гостей.';
     announcementTime.textContent = 'Заезд после ' + card.offer.checkin + ', выезд до ' + card.offer.checkout;
 
