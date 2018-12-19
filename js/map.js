@@ -29,19 +29,22 @@
     window.pins.getAnnouncements();
     window.form.enableFormInputs();
     window.form.setMinAvailablePriceToPriceInput();
+    window.form.setRequredInputsErrorListeners();
+
   }
 
   function deactivateMapAndForm() {
     window.data.mapBlock.classList.add('map--faded');
     noticeForm.classList.add('ad-form--disabled');
-    window.form.disableFormInputs();
-    setPosition(mapPinMain, startMapPinMainCoords.left, startMapPinMainCoords.top);
-    setAddress(startMapPinMainCoords);
+    window.form.removeRequredInputsErrorListeners();
     window.form.setDefaultInputsValue();
-    window.pins.closeAnnouncement();
-    window.pins.clearPins();
+    window.form.disableFormInputs();
     window.filter.resetFilters();
     window.filter.disableFilters();
+    setPosition(mapPinMain, startMapPinMainCoords.left, startMapPinMainCoords.top);
+    setAddress(startMapPinMainCoords);
+    window.pins.closeAnnouncement();
+    window.pins.clearPins();
     isMapActivated = false;
   }
 

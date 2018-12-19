@@ -10,11 +10,11 @@
   var titleInput = notice.querySelector('#title');
   var typeInput = notice.querySelector('#type');
   var priceInput = notice.querySelector('#price');
-  var minAvailablePrice = {
-    bungalo: 0,
-    flat: 1000,
-    house: 5000,
-    palace: 10000
+  var MinAvailablePrice = {
+    BUNGALO: 0,
+    FLAT: 1000,
+    HOUSE: 5000,
+    PALACE: 10000
   };
   var timeinInput = notice.querySelector('#timein');
   var timeoutInput = notice.querySelector('#timeout');
@@ -58,9 +58,11 @@
 
   function setMinAvailablePriceToPriceInput() {
     for (var i = 0; i < typeInput.options.length; i++) {
-      if (typeInput.value === window.data.apartmentTypeShort[i]) {
-        priceInput.setAttribute('min', minAvailablePrice[window.data.apartmentTypeShort[i]]);
-        priceInput.setAttribute('placeholder', minAvailablePrice[window.data.apartmentTypeShort[i]]);
+      var currentOptionType = typeInput.options[i].value;
+
+      if (typeInput.value === currentOptionType) {
+        priceInput.setAttribute('min', MinAvailablePrice[currentOptionType.toUpperCase()]);
+        priceInput.setAttribute('placeholder', MinAvailablePrice[currentOptionType.toUpperCase()]);
       }
     }
   }
@@ -130,9 +132,10 @@
 
   function setDefaultInputsValue() {
     setSelectsDefaultValue();
+    setMinAvailablePriceToPriceInput();
     resetFeatures();
     titleInput.value = '';
-    priceInput.value = null;
+    priceInput.value = '';
     descriptionInput.value = '';
     window.upload.setDefaultAvatar();
     window.upload.resetUploadedPhotos();
@@ -148,8 +151,8 @@
     roomsInput.addEventListener('change', onRoomInputChange);
   }
 
-  titleInput.addEventListener('invalid', function () {
-    titleInput.style.border = '2px solid red';
+  var onTitleInputError = function () {
+    titleInput.style.outline = '2px solid red';
     if (titleInput.validity.tooShort) {
       titleInput.setCustomValidity('Заголовок должен состоять минимум из 30-и символов');
     } else if (titleInput.validity.tooLong) {
@@ -158,12 +161,12 @@
       titleInput.setCustomValidity('Это обязательное поле');
     } else {
       titleInput.setCustomValidity('');
-      titleInput.style.border = 'none';
+      titleInput.style.outline = 'none';
     }
-  });
+  };
 
-  priceInput.addEventListener('invalid', function () {
-    priceInput.style.border = '2px solid red';
+  var onPriceInputError = function () {
+    priceInput.style.outline = '2px solid red';
     if (priceInput.validity.rangeOverflow) {
       priceInput.setCustomValidity('Цена больше максимально допустимой');
     } else if (priceInput.validity.rangeUnderflow) {
@@ -172,9 +175,19 @@
       priceInput.setCustomValidity('Это обязательное поле');
     } else {
       priceInput.setCustomValidity('');
-      priceInput.style.border = 'none';
+      priceInput.style.outline = 'none';
     }
-  });
+  };
+
+  var setRequredInputsErrorListeners = function () {
+    titleInput.addEventListener('invalid', onTitleInputError);
+    priceInput.addEventListener('invalid', onPriceInputError);
+  };
+
+  var removeRequredInputsErrorListeners = function () {
+    titleInput.removeEventListener('invalid', onTitleInputError);
+    priceInput.removeEventListener('invalid', onPriceInputError);
+  };
 
   window.upload.setAvatarUploader();
   window.upload.setPhotosUploader();
@@ -185,6 +198,8 @@
     setAnnoucementFormListeners: setAnnoucementFormListeners,
     setMaxAvailableGuests: setMaxAvailableGuests,
     setDefaultInputsValue: setDefaultInputsValue,
-    setMinAvailablePriceToPriceInput: setMinAvailablePriceToPriceInput
+    setMinAvailablePriceToPriceInput: setMinAvailablePriceToPriceInput,
+    setRequredInputsErrorListeners: setRequredInputsErrorListeners,
+    removeRequredInputsErrorListeners: removeRequredInputsErrorListeners
   };
 })();

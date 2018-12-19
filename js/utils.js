@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var ESC_KEY_CODE = 27;
+
   window.utils = {
     getRandomNumber: function (min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -16,8 +18,6 @@
       };
     },
     isEscEvent: function (evt, action) {
-      var ESC_KEY_CODE = 27;
-
       if (evt.keyCode === ESC_KEY_CODE) {
         action();
       }
