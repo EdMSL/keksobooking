@@ -11,6 +11,7 @@
   var isMapActivated = false;
   var mapCoords = window.utils.getElementCoords(window.data.map);
   var startMapPinMainCoords = getStartMapPinMainCoords();
+  var errorCloseButton;
 
   function getStartMapPinMainCoords() {
     return {
@@ -131,7 +132,7 @@
     window.data.mapBlock.removeChild(errorWindow);
     document.removeEventListener('keydown', onErrorWindowEscPress);
     document.removeEventListener('click', onErrorWindowClick);
-    window.map.errorCloseButton.removeEventListener('click', onErrorCloseButtonClick);
+    errorCloseButton.removeEventListener('click', onErrorCloseButtonClick);
   }
 
   function onErrorWindowEscPress(evt) {
@@ -149,12 +150,11 @@
 
   function onErrorAnnouncementSave() {
     window.render.renderErrorWindow();
-    var errorCloseButton = window.data.mapBlock.querySelector('.error__button');
+    errorCloseButton = window.data.mapBlock.querySelector('.error__button');
     document.addEventListener('keydown', onErrorWindowEscPress);
     document.addEventListener('click', onErrorWindowClick);
     errorCloseButton.addEventListener('click', onErrorCloseButtonClick);
 
-    window.map.errorCloseButton = errorCloseButton;
   }
 
   window.form.disableFormInputs();
@@ -165,7 +165,7 @@
   mapPinMain.addEventListener('mousedown', onMapPinMainMousedown);
 
   noticeForm.addEventListener('submit', function (evt) {
-    window.backend.save('https://js.dump.academy/keksobooking', new FormData(noticeForm), onSuccesAnnouncementSave, onErrorAnnouncementSave);
+    window.backend.save('https://js.dump.academy/keksobookin', new FormData(noticeForm), onSuccesAnnouncementSave, onErrorAnnouncementSave);
     evt.preventDefault();
   });
 
