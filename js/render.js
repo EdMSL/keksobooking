@@ -4,6 +4,10 @@
   var mapBlock = window.data.mapBlock;
   var map = window.data.map;
   var filtersContainer = mapBlock.querySelector('.map__filters-container');
+  var pinTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
+  var announcementTemplate = document.querySelector('#card').content.querySelector('.map__card');
+  var successTemplate = document.querySelector('#success').content.querySelector('.success');
+  var errorTemplate = document.querySelector('#error').content.querySelector('.error');
   var ApartmentTypePrint = {
     PALACE: 'Дворец',
     FLAT: 'Квартира',
@@ -12,7 +16,6 @@
   };
 
   function renderMapPins(cards) {
-    var pinTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
     var maxRenderedPins = 5;
     var fragment = document.createDocumentFragment();
 
@@ -62,7 +65,6 @@
   }
 
   function renderAnnouncement(card) {
-    var announcementTemplate = document.querySelector('#card').content.querySelector('.map__card');
     var announcementElement = announcementTemplate.cloneNode(true);
     var announcementTitle = announcementElement.querySelector('.popup__title');
     var announcementAddress = announcementElement.querySelector('.popup__text--address');
@@ -107,13 +109,11 @@
   }
 
   function renderSuccessWindow() {
-    var successTemplate = document.querySelector('#success').content.querySelector('.success');
     var successWindow = successTemplate.cloneNode(true);
     mapBlock.insertBefore(successWindow, map);
   }
 
   function renderErrorWindow() {
-    var errorTemplate = document.querySelector('#error').content.querySelector('.error');
     var errorWindow = errorTemplate.cloneNode(true);
     mapBlock.insertBefore(errorWindow, map);
   }
