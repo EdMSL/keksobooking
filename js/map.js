@@ -165,7 +165,7 @@
   mapPinMain.addEventListener('mousedown', onMapPinMainMousedown);
 
   noticeForm.addEventListener('submit', function (evt) {
-    window.backend.save('https://js.dump.academy/keksobookin', new FormData(noticeForm), onSuccesAnnouncementSave, onErrorAnnouncementSave);
+    window.backend.save('https://js.dump.academy/keksobooking', new FormData(noticeForm), onSuccesAnnouncementSave, onErrorAnnouncementSave);
     evt.preventDefault();
   });
 
