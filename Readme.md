@@ -4,6 +4,8 @@
 * Наставник: [Сергей Рубец](https://htmlacademy.ru/profile/amator).
 
 ---
+[Посмотреть в готовом виде](https://edmsl-compilation.000webhostapp.com/keksobooking/index.html)
+---
 
 _Не удаляйте и не обращайте внимание на файлы:_<br>
 _`.editorconfig`, `.eslintrc`, `.gitattributes`, `.gitignore`, `.travis.yml`, `package-lock.json`, `package.json`._
