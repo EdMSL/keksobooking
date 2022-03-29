@@ -95,7 +95,7 @@
   }
 
   function getAnnouncements() {
-    window.backend.load('https://js.dump.academy/keksobooking/data', onSuccesAnnouncementsLoad, onErrorAnnouncementsLoad);
+    window.backend.load('https://24.javascript.pages.academy/keksobooking/data', onSuccesAnnouncementsLoad, onErrorAnnouncementsLoad);
   }
 
   window.data.map.addEventListener('click', onMapPinClick);
