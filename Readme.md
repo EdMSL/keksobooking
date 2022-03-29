@@ -4,7 +4,7 @@
 * Наставник: [Сергей Рубец](https://htmlacademy.ru/profile/amator).
 
 ---
-[Посмотреть в готовом виде](https://edmsl-compilation.000webhostapp.com/keksobooking/index.html)
+[Посмотреть в готовом виде](https://edmsl.github.io/keksobooking/)
 ---
 
 _Не удаляйте и не обращайте внимание на файлы:_<br>
